@@ -1,0 +1,48 @@
+[global]
+    monitor = 0
+    follow = mouse
+    width = 360
+    height = 190
+    origin = top-right
+    offset = 14x14
+    scale = 0
+
+    font = Hack Nerd Font 12
+    line_height = 4
+    markup = full
+    format = "<b>%s</b>\n%b"
+    sort = yes
+    indicate_hidden = yes
+    alignment = left
+    vertical_alignment = center
+    show_age_threshold = 60
+    sticky_history = yes
+
+    frame_width = 2
+    separator_height = 2
+    padding = 14
+    horizontal_padding = 16
+    text_icon_padding = 12
+    corner_radius = 12
+
+    idle_threshold = 120
+    transparency = 0
+
+[urgency_low]
+    background = "#313244"
+    foreground = "#cdd6f4"
+    frame_color = "#89b4fa"
+    timeout = 4
+
+[urgency_normal]
+    background = "#1e1e2e"
+    foreground = "#cdd6f4"
+    frame_color = "#cba6f7"
+    timeout = 6
+
+[urgency_critical]
+    background = "#f38ba8"
+    foreground = "#1e1e2e"
+    frame_color = "#f38ba8"
+    timeout = 0
+

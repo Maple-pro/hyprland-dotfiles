@@ -1,0 +1,109 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 34,
+    "spacing": 4,
+    "margin-top": 8,
+    "margin-left": 8,
+    "margin-right": 8,
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["network", "pulseaudio", "backlight", "battery", "memory", "cpu", "tray"],
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "format-icons": {
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            "6": "6",
+            "7": "7",
+            "8": "8",
+            "9": "9",
+            "10": "10",
+            "active": "",
+            "empty": "",
+            "persistent": "",
+            "special": ""
+        },
+        "on-click": "activate",
+        "on-scroll-up": "hyprctl dispatch workspace m-1",
+        "on-scroll-down": "hyprctl dispatch workspace m+1"
+    },
+
+    "hyprland/window": {
+        "format": "{title}",
+        "max-length": 60,
+        "separate-outputs": true
+    },
+
+    "clock": {
+        "format": "{:%a %b %d  %H:%M}",
+        "format-alt": "{:%Y-%m-%d  %H:%M:%S}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "mode-mon-col": 3,
+            "weeks-pos": "right"
+        },
+        "on-click-right": "mode",
+        "interval": 10
+    },
+
+    "network": {
+        "format-wifi": "{signalStrength}% 󰤨",
+        "format-ethernet": "{ifname} 󰈀",
+        "format-disconnected": "󰖪",
+        "tooltip-format": "{ifname}: {ipaddr}/{cidr}",
+        "format-linked": "{ifname} (no IP) 󰈀",
+        "on-click": "nm-connection-editor"
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-bluetooth": "{icon} 󰂰 {volume}%",
+        "format-muted": "󰝟",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "tooltip-format": "{desc}\n{volume}%",
+        "on-click": "pavucontrol",
+        "on-click-right": "pamixer -t"
+    },
+
+    "backlight": {
+        "device": "intel_backlight",
+        "format": "{icon} {percent}%",
+        "format-icons": ["󰃞", "󰃟", "󰃠"],
+        "on-scroll-up": "brightnessctl set +5%",
+        "on-scroll-down": "brightnessctl set 5%-"
+    },
+
+    "battery": {
+        "states": {
+            "warning": 20,
+            "critical": 10
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-plugged": "󰚥 {capacity}%",
+        "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+    },
+
+    "memory": {
+        "format": "󰘚 {percentage}%",
+        "interval": 5
+    },
+
+    "cpu": {
+        "format": "󰻠 {usage}%",
+        "interval": 5
+    },
+
+    "tray": {
+        "icon-size": 18,
+        "spacing": 8
+    }
+}
