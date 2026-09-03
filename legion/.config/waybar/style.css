@@ -1,0 +1,128 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "Hack Nerd Font", "Symbols Nerd Font", "Noto Sans CJK SC", sans-serif;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(30, 30, 46, 0.72);
+    color: #cdd6f4;
+    border-radius: 12px;
+    border: 1px solid rgba(49, 50, 68, 0.90);
+}
+
+tooltip {
+    background: rgba(30, 30, 46, 0.96);
+    border: 1px solid #313244;
+    border-radius: 10px;
+}
+
+tooltip label {
+    color: #cdd6f4;
+    padding: 6px;
+}
+
+#workspaces,
+#window,
+#clock,
+#pulseaudio,
+#custom-mic,
+#keyboard-state,
+#backlight,
+#battery,
+#memory,
+#cpu,
+#custom-clash-party,
+#tray {
+    padding: 0 10px;
+    color: #cdd6f4;
+    border-radius: 10px;
+}
+
+#workspaces button {
+    padding: 0 7px;
+    color: #a6adc8;
+    background: transparent;
+    border-radius: 8px;
+}
+
+#workspaces button.active {
+    color: #1e1e2e;
+    background: #cba6f7;
+}
+
+#workspaces button.urgent {
+    color: #1e1e2e;
+    background: #f38ba8;
+}
+
+#workspaces button:hover {
+    background: rgba(137, 180, 250, 0.20);
+    color: #cdd6f4;
+}
+
+#clock {
+    color: #f5c2e7;
+    font-weight: bold;
+}
+
+#pulseaudio {
+    color: #a6e3a1;
+}
+
+#custom-mic.active {
+    color: #a6e3a1;
+}
+
+#custom-mic.muted {
+    color: #f38ba8;
+}
+
+#keyboard-state.locked {
+    color: #f9e2af;
+}
+
+#custom-clash-party.running {
+    color: #f9e2af;
+}
+
+#custom-clash-party.stopped {
+    color: #a6adc8;
+}
+
+#backlight {
+    color: #f9e2af;
+}
+
+#battery {
+    color: #94e2d5;
+}
+
+#battery.critical:not(.charging) {
+    color: #f38ba8;
+    animation-name: blink;
+    animation-duration: 0.6s;
+    animation-timing-function: steps(2, start);
+    animation-iteration-count: infinite;
+}
+
+#memory {
+    color: #cba6f7;
+}
+
+#cpu {
+    color: #fab387;
+}
+
+#tray {
+    padding: 0 6px;
+}
+
+@keyframes blink {
+    to {
+        color: #1e1e2e;
+        background-color: #f38ba8;
+    }
+}

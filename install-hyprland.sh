@@ -41,5 +41,5 @@ fc-cache -f
 
 echo
 echo "Hyprland packages installed."
-echo "The configuration files are already in place under ~/.config."
+echo "Copy the huawei/ or legion/ profile into ~/.config as described in README.md."
 echo "Log out of KDE and choose the Hyprland session from SDDM, or run: start-hyprland"

@@ -1,0 +1,79 @@
+* {
+    background-color: rgba(30, 30, 46, 0.96);
+    foreground-color: #cdd6f4;
+    border-color: #313244;
+    selected-normal-background: rgba(137, 180, 250, 0.18);
+    selected-normal-foreground: #cdd6f4;
+    selected-urgent-background: rgba(243, 139, 168, 0.24);
+    selected-active-background: rgba(137, 180, 250, 0.20);
+    text-color: #cdd6f4;
+    highlight: #89b4fa;
+    urgent: #f38ba8;
+    active: #cba6f7;
+}
+
+window {
+    fullscreen: false;
+    width: 36%;
+    x-offset: 0;
+    y-offset: 0;
+    location: center;
+    anchor: center;
+    border: 2px;
+    border-color: #313244;
+    border-radius: 14px;
+    padding: 8px;
+    transparency: "real";
+}
+
+inputbar {
+    background-color: rgba(49, 50, 68, 0.80);
+    border-radius: 8px;
+    padding: 8px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    padding: 2px 8px 2px 4px;
+    text-color: #cba6f7;
+    font: "Hack Nerd Font 13";
+}
+
+entry {
+    padding: 2px;
+    text-color: #cdd6f4;
+    caret-color: #89b4fa;
+    font: "Hack Nerd Font 13";
+}
+
+listview {
+    padding: 6px 0;
+    border-radius: 8px;
+    lines: 10;
+    columns: 1;
+    fixed-height: false;
+    dynamic: true;
+}
+
+element {
+    padding: 8px 10px;
+    border-radius: 8px;
+    text-color: #cdd6f4;
+    cursor: pointer;
+}
+
+element selected {
+    background-color: rgba(137, 180, 250, 0.18);
+    text-color: #cdd6f4;
+}
+
+element-text {
+    text-color: inherit;
+    vertical-align: 0.5;
+}
+
+element-icon {
+    size: 1.2em;
+    margin: 0 8px 0 0;
+}
+
