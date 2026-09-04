@@ -8,7 +8,7 @@
     "margin-right": 8,
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["pulseaudio", "custom/mic", "keyboard-state", "backlight", "battery", "memory", "cpu", "custom/clash-party", "tray"],
+    "modules-right": ["pulseaudio", "custom/mic", "keyboard-state", "backlight", "battery", "memory", "cpu", "tray"],
 
     "hyprland/workspaces": {
         "format": "{icon}",

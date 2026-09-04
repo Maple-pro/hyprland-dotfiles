@@ -29,7 +29,12 @@ hl.env("ELECTRON_OZONE_PLATFORM_HINT", "auto")
 hl.env("_JAVA_AWT_WM_NONREPARENTING", "1")
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
-hl.env("GTK_IM_MODULE", "")
+hl.env("XFT_DPI", "120")
+hl.env("XMODIFIERS", "@im=fcitx")
+hl.env("QT_IM_MODULE", "fcitx")
+hl.env("SDL_IM_MODULE", "fcitx")
+hl.env("GLFW_IM_MODULE", "fcitx")
+hl.env("ELECTRON_TRAY_IMPL", "statusnotifier")
 
 -- -----------------------------------------------------------------------------
 -- Monitors
@@ -41,11 +46,19 @@ hl.monitor({
     scale    = 1.25,
 })
 
+hl.config({
+    xwayland = {
+        force_zero_scaling = true,
+        use_nearest_neighbor = true,
+    },
+})
+
 -- -----------------------------------------------------------------------------
 -- Autostart
 -- -----------------------------------------------------------------------------
 hl.on("hyprland.start", function()
     hl.exec_cmd("dbus-update-activation-environment --systemd --all")
+    hl.exec_cmd("xrdb -merge /home/yangfeng/.Xresources")
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd("waybar")
     hl.exec_cmd("dunst")
@@ -55,7 +68,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("blueman-applet")
     hl.exec_cmd("fcitx5 -d --replace")
     hl.exec_cmd("foot")
-    hl.exec_cmd("mihomo-party")
+    hl.exec_cmd("sleep 3 && mihomo-party --enable-features-StatusNotifierItem -ozone-platform-hint=auto")
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
     hl.exec_cmd("wl-paste --type image --watch cliphist store")
 end)
@@ -95,8 +108,8 @@ hl.config({
 -- -----------------------------------------------------------------------------
 hl.config({
     general = {
-        gaps_in     = 6,
-        gaps_out    = { top = 5, right = 12, bottom = 12, left = 12 },
+        gaps_in     = 5,
+        gaps_out    = { top = 5, right = 8, bottom = 8, left = 8 },
         border_size = 2,
 
         col = {
@@ -255,6 +268,15 @@ hl.window_rule({
     no_blur = true,
     border_size = 0,
     rounding = 0,
+})
+
+-- Wechat XWayland 弹出窗口禁用模糊、阴影和边框
+hl.window_rule({
+    name       = "fix-wechat",
+    match      = { class = "wechat", title = "wechat" },
+    no_blur    = true,
+    no_shadow  = true,
+    border_size = 0,
 })
 
 hl.window_rule({
