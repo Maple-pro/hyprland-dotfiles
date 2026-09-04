@@ -4,7 +4,7 @@
 -- -----------------------------------------------------------------------------
 
 local terminal    = "foot"
-local fileManager = "dolphin"
+local fileManager = "doublecmd"
 local menu        = "rofi -show drun"
 local browser     = "google-chrome-stable"
 local editor      = "kate"
@@ -48,6 +48,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("dunst")
     hl.exec_cmd("hyprpolkitagent")
     hl.exec_cmd("hypridle")
+    hl.exec_cmd("nm-applet")
     hl.exec_cmd("blueman-applet")
     hl.exec_cmd("fcitx5 -d --replace")
     hl.exec_cmd("foot")
@@ -91,8 +92,8 @@ hl.config({
 -- -----------------------------------------------------------------------------
 hl.config({
     general = {
-        gaps_in     = 6,
-        gaps_out    = { top = 5, right = 12, bottom = 12, left = 12 },
+        gaps_in     = 5,
+        gaps_out    = { top = 5, right = 8, bottom = 8, left = 8 },
         border_size = 2,
 
         col = {
@@ -208,10 +209,10 @@ hl.config({
 -- Window rules
 -- -----------------------------------------------------------------------------
 hl.window_rule({
-    name  = "float-dolphin",
-    match = { class = "^org.kde.dolphin$" },
+    name  = "float-file-manager",
+    match = { class = "^(doublecmd|doublecmd-qt6|doublecmd-qt|Double Commander)$" },
     float = true,
-    size  = "75% 75%",
+    size  = { "(monitor_w*0.75)", "(monitor_h*0.75)" },
     center = true,
 })
 
@@ -225,6 +226,13 @@ hl.window_rule({
     name  = "float-blueman-manager",
     match = { class = "^blueman-manager$" },
     float = true,
+})
+
+hl.window_rule({
+    name  = "float-network-manager",
+    match = { class = "^(nm-connection-editor|nm-applet)$" },
+    float = true,
+    center = true,
 })
 
 hl.window_rule({
@@ -245,6 +253,14 @@ hl.window_rule({
     no_blur = true,
     border_size = 0,
     rounding = 0,
+})
+
+hl.window_rule({
+    name       = "fix-wechat",
+    match      = { class = "wechat", title = "wechat" },
+    no_blur    = true,
+    no_shadow  = true,
+    border_size = 0,
 })
 
 hl.window_rule({

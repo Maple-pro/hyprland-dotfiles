@@ -27,8 +27,8 @@ tooltip label {
 #workspaces,
 #window,
 #clock,
-#network,
 #pulseaudio,
+#keyboard-state,
 #backlight,
 #battery,
 #memory,
@@ -66,12 +66,12 @@ tooltip label {
     font-weight: bold;
 }
 
-#network {
-    color: #e0eaff;
-}
-
 #pulseaudio {
     color: #a6e3a1;
+}
+
+#keyboard-state.locked {
+    color: #f9e2af;
 }
 
 #backlight {
