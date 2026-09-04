@@ -20,9 +20,11 @@ hl.env("XDG_SESSION_DESKTOP", "Hyprland")
 hl.env("AQ_DRM_DEVICES", "/dev/dri/card1")
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
-hl.env("QT_SCALE_FACTOR", "1.25")
+hl.env("QT_SCALE_FACTOR", "1")
 hl.env("QT_SCALE_FACTOR_ROUNDING_POLICY", "RoundPreferFloor")
 hl.env("GDK_BACKEND", "wayland,x11")
+hl.env("GDK_SCALE", "1")
+hl.env("GDK_DPI_SCALE", "1")
 hl.env("SDL_VIDEODRIVER", "wayland")
 hl.env("MOZ_ENABLE_WAYLAND", "1")
 hl.env("ELECTRON_OZONE_PLATFORM_HINT", "auto")
@@ -270,10 +272,18 @@ hl.window_rule({
     rounding = 0,
 })
 
--- Wechat XWayland 弹出窗口禁用模糊、阴影和边框
+-- Wechat, wps XWayland 弹出窗口禁用模糊、阴影和边框
 hl.window_rule({
     name       = "fix-wechat",
     match      = { class = "wechat", title = "wechat" },
+    no_blur    = true,
+    no_shadow  = true,
+    border_size = 0,
+})
+
+hl.window_rule({
+    name       = "fix-wps",
+    match      = { class = "wps" },
     no_blur    = true,
     no_shadow  = true,
     border_size = 0,
