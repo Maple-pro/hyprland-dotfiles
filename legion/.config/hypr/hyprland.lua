@@ -11,6 +11,9 @@ local editor      = "kate"
 local powerMenu   = "/home/yangfeng/.config/hypr/scripts/powermenu.sh"
 local mainMod     = "SUPER"
 
+-- 切换圆角 / margin：true = 圆角 + 外边距，false = 0 圆角 + 0 外边距
+local rounded = false
+
 -- -----------------------------------------------------------------------------
 -- Environment
 -- -----------------------------------------------------------------------------
@@ -20,7 +23,7 @@ hl.env("XDG_SESSION_DESKTOP", "Hyprland")
 hl.env("AQ_DRM_DEVICES", "/dev/dri/card1")
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
-hl.env("QT_SCALE_FACTOR", "1")
+hl.env("QT_SCALE_FACTOR", "1.2")
 hl.env("QT_SCALE_FACTOR_ROUNDING_POLICY", "RoundPreferFloor")
 hl.env("GDK_BACKEND", "wayland,x11")
 hl.env("GDK_SCALE", "1")
@@ -60,8 +63,10 @@ hl.config({
 -- -----------------------------------------------------------------------------
 hl.on("hyprland.start", function()
     hl.exec_cmd("dbus-update-activation-environment --systemd --all")
+    hl.exec_cmd("/usr/lib/pam_kwallet_init")
     hl.exec_cmd("xrdb -merge /home/yangfeng/.Xresources")
     hl.exec_cmd("hyprpaper")
+    hl.exec_cmd("/home/yangfeng/.config/hypr/scripts/apply-rounding.sh apply " .. (rounded and "rounded" or "square"))
     hl.exec_cmd("waybar")
     hl.exec_cmd("dunst")
     hl.exec_cmd("hyprpolkitagent")
@@ -73,6 +78,10 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("sleep 3 && mihomo-party --enable-features-StatusNotifierItem -ozone-platform-hint=auto")
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
     hl.exec_cmd("wl-paste --type image --watch cliphist store")
+end)
+
+hl.on("config.reloaded", function()
+    hl.exec_cmd("/home/yangfeng/.config/hypr/scripts/apply-rounding.sh reload")
 end)
 
 -- -----------------------------------------------------------------------------
@@ -110,17 +119,17 @@ hl.config({
 -- -----------------------------------------------------------------------------
 hl.config({
     general = {
-        gaps_in     = 5,
-        gaps_out    = { top = 5, right = 8, bottom = 8, left = 8 },
-        border_size = 2,
 
         col = {
             active_border = {
                 colors = { "rgba(cba6f7ee)", "rgba(f5c2e7ee)" },
-                angle  = 45,
+                angle  = rounded and 45 or 0,
             },
             inactive_border = "rgba(313244cc)",
         },
+        gaps_in     = rounded and 5 or 0,
+        gaps_out    = rounded and { top = 5, right = 8, bottom = 8, left = 8 } or { top = 0, right = 0, bottom = 0, left = 0 },
+        border_size = rounded and 2 or 1,
 
         resize_on_border    = true,
         hover_icon_on_border = true,
@@ -134,19 +143,19 @@ hl.config({
     },
 
     decoration = {
-        rounding       = 12,
+        rounding        = rounded and 12 or 0,
         active_opacity   = 1.0,
         inactive_opacity = 0.94,
 
         shadow = {
-            enabled      = true,
+            enabled      = rounded,
             range        = 18,
             render_power = 3,
             color        = 0xaa1a1b26,
         },
 
         blur = {
-            enabled          = true,
+            enabled          = rounded,
             size             = 5,
             passes           = 2,
             ignore_opacity   = true,
@@ -322,6 +331,7 @@ hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("cliphist list | rofi -dmenu 
 hl.bind(mainMod .. " + L",      hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + X",      hl.dsp.exec_cmd(powerMenu))
 hl.bind(mainMod .. " + M",      hl.dsp.exec_cmd("pkill -SIGUSR1 waybar"))
+hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("/home/yangfeng/.config/hypr/scripts/apply-rounding.sh toggle"), {description = "Toggle rounded corners and margins"})
 hl.bind(mainMod .. " + ESCAPE", hl.dsp.exit())
 
 -- Focus
@@ -373,3 +383,5 @@ hl.bind("XF86AudioNext",         hl.dsp.exec_cmd("playerctl next"),             
 hl.bind("XF86AudioPause",        hl.dsp.exec_cmd("playerctl play-pause"),                              { locked = true })
 hl.bind("XF86AudioPlay",         hl.dsp.exec_cmd("playerctl play-pause"),                              { locked = true })
 hl.bind("XF86AudioPrev",         hl.dsp.exec_cmd("playerctl previous"),                                { locked = true })
+
+hl.bind(mainMod .. " + SLASH", hl.dsp.exec_cmd("hotkeyhub --hyprland"), {description = "Hotkeys cheat sheet"})
