@@ -91,9 +91,9 @@ restart_waybar() {
     sleep 0.2
 
     if command -v hyprctl >/dev/null 2>&1; then
-        hyprctl dispatch exec waybar >/dev/null 2>&1 || { nohup waybar >/dev/null 2>&1 & }
+        hyprctl dispatch exec "${HOME}/.config/hypr/scripts/start-waybar.sh" >/dev/null 2>&1 || { nohup "${HOME}/.config/hypr/scripts/start-waybar.sh" >/dev/null 2>&1 & }
     else
-        nohup waybar >/dev/null 2>&1 &
+        nohup "${HOME}/.config/hypr/scripts/start-waybar.sh" >/dev/null 2>&1 &
     fi
 }
 
