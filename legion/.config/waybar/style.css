@@ -44,28 +44,38 @@ tooltip label {
 #workspaces button {
     padding: 0 6px;
     margin: 0 1px;
-    color: #a6adc8;
-    background: rgba(137, 180, 250, 0.12);
+    color: #cdd6f4;
+    background: rgba(69, 71, 90, 0.88);
+    border: 1px solid rgba(180, 190, 254, 0.55);
     border-radius: 8px;
 }
 
 #workspaces button.active {
     color: #1e1e2e;
     background: #cba6f7;
+    border-color: #f5c2e7;
 }
 
 #workspaces button.urgent {
     color: #1e1e2e;
     background: #f38ba8;
+    border-color: #f38ba8;
 }
 
 #workspaces button:hover {
-    background: rgba(137, 180, 250, 0.28);
+    background: rgba(89, 98, 135, 0.95);
+    border-color: #89b4fa;
     color: #cdd6f4;
 }
 
+#workspaces button.active:hover {
+    background: #d9baff;
+    border-color: #f5c2e7;
+    color: #1e1e2e;
+}
+
 #workspaces button:active {
-    background: rgba(137, 180, 250, 0.45);
+    background: #89b4fa;
     color: #1e1e2e;
 }
 
