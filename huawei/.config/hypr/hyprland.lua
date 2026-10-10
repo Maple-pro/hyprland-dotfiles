@@ -268,6 +268,13 @@ hl.window_rule({
 	workspace = "5 silent",
 })
 
+-- WPS PDF (运行时窗口类是 "pdf"，桌面项的 StartupWMClass 是 "wpspdf")
+hl.window_rule({
+	name = "ws-pdf",
+	match = { class = "^(pdf|wpspdf)$" },
+	workspace = "5 silent",
+})
+
 -- FSearch: floating search palette instead of a tiled window.
 hl.window_rule({
 	name = "float-fsearch",
