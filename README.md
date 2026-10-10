@@ -30,14 +30,45 @@ legion/.config/waybar/               Waybar status bar
 legion/.config/rofi/                 Rofi application launcher and window switcher
 legion/.config/foot/                 Foot terminal
 legion/.config/dunst/                Dunst notifications
+huawei/install-hyprland.sh           Huawei package + configuration installer
+legion/install-hyprland.sh           Legion package + configuration installer
 Hyprland_Guide.md                    Basic usage guide
-install-hyprland.sh                  Package installer for the companion applications
 ```
 
-## Install configuration files
+The two profiles are maintained independently, so each one carries its own
+installer: the machines need different packages and different files.
 
-Both profiles are meant to be placed under `~/.config/`. Install the Huawei
-machine configuration with:
+## Install
+
+Each profile ships its own installer, because the two machines need different
+packages and different files. Run the one that matches the machine:
+
+```bash
+bash huawei/install-hyprland.sh     # on the Huawei machine
+bash legion/install-hyprland.sh     # on the Legion machine
+```
+
+The installer:
+
+1. installs that profile's packages from the official repositories
+2. copies its configuration into `~/.config` — and, on Huawei, the Fcitx5 user
+   theme into `~/.local/share/fcitx5/themes`
+
+Anything it would overwrite is copied to `~/.dotfiles-backup-<timestamp>/`
+first, and pacman runs with `--needed`, so re-running is safe. Packages that are
+not in the official repositories are printed at the end rather than installed,
+so no AUR helper is required. Running the script as your normal user is
+preferred: it escalates with `sudo` only for pacman.
+
+After copying or editing the Hyprland config, reload it with:
+
+```bash
+hyprctl reload
+```
+
+### Manual installation
+
+The Huawei script is equivalent to:
 
 ```bash
 cp -a huawei/.config/hypr ~/.config/
@@ -60,7 +91,7 @@ cp -a huawei/.local/share/fcitx5/themes/catppuccin-latte-purple \
       ~/.local/share/fcitx5/themes/
 ```
 
-Or install the Legion machine configuration with:
+The Legion script is equivalent to:
 
 ```bash
 cp -a legion/.config/hypr ~/.config/
@@ -70,11 +101,9 @@ cp -a legion/.config/foot ~/.config/
 cp -a legion/.config/dunst ~/.config/
 ```
 
-After copying or editing the Hyprland config, reload it with:
-
-```bash
-hyprctl reload
-```
+The manual copies merge into existing directories rather than replacing them, so
+files that a profile has since dropped are left behind. The installers behave
+the same way; only the backup protects you there.
 
 ## Huawei theme layer
 
