@@ -2,25 +2,26 @@
     border: none;
     border-radius: 0;
     font-family: "Hack Nerd Font", "Symbols Nerd Font", "Noto Sans CJK SC", sans-serif;
-    font-size: 13px;
+    font-size: 14px;
     min-height: 0;
 }
 
+/* Catppuccin Latte (light) */
 window#waybar {
-    background: rgba(30, 30, 46, 0.72);
-    color: #cdd6f4;
-    border-radius: 12px;
-    border: 1px solid rgba(49, 50, 68, 0.90);
+    background: rgba(239, 241, 245, 0.72);
+    color: #4c4f69;
+    /* border-radius: 12px; */
+    border: 1px solid rgba(188, 192, 204, 0.90);
 }
 
 tooltip {
-    background: rgba(30, 30, 46, 0.96);
-    border: 1px solid #313244;
+    background: rgba(239, 241, 245, 0.96);
+    border: 1px solid #bcc0cc;
     border-radius: 10px;
 }
 
 tooltip label {
-    color: #cdd6f4;
+    color: #4c4f69;
     padding: 6px;
 }
 
@@ -35,55 +36,65 @@ tooltip label {
 #cpu,
 #tray {
     padding: 0 10px;
-    color: #cdd6f4;
+    color: #4c4f69;
     border-radius: 10px;
 }
 
 #workspaces button {
-    padding: 0 7px;
-    color: #a6adc8;
-    background: transparent;
-    border-radius: 8px;
+    padding: 0 10px;
+    margin: 3px 2px;
+    color: #4c4f69;
+    font-weight: 600;
+    background: #ccd0da;
+    border-radius: 999px;
 }
 
 #workspaces button.active {
-    color: #1e1e2e;
-    background: #cba6f7;
+    color: #eff1f5;
+    font-weight: 700;
+    background: #8839ef;
 }
 
 #workspaces button.urgent {
-    color: #1e1e2e;
-    background: #f38ba8;
+    color: #eff1f5;
+    font-weight: 700;
+    background: #d20f39;
 }
 
+/* 可点击切换 workspace：hover 高亮、按下加深 */
 #workspaces button:hover {
-    background: rgba(137, 180, 250, 0.20);
-    color: #cdd6f4;
+    background: rgba(30, 102, 245, 0.28);
+    color: #4c4f69;
+}
+
+#workspaces button:active {
+    background: rgba(30, 102, 245, 0.45);
+    color: #4c4f69;
 }
 
 #clock {
-    color: #f5c2e7;
+    color: #ea76cb;
     font-weight: bold;
 }
 
 #pulseaudio {
-    color: #a6e3a1;
+    color: #40a02b;
 }
 
 #keyboard-state.locked {
-    color: #f9e2af;
+    color: #df8e1d;
 }
 
 #backlight {
-    color: #f9e2af;
+    color: #df8e1d;
 }
 
 #battery {
-    color: #94e2d5;
+    color: #179299;
 }
 
 #battery.critical:not(.charging) {
-    color: #f38ba8;
+    color: #d20f39;
     animation-name: blink;
     animation-duration: 0.6s;
     animation-timing-function: steps(2, start);
@@ -91,11 +102,11 @@ tooltip label {
 }
 
 #memory {
-    color: #cba6f7;
+    color: #8839ef;
 }
 
 #cpu {
-    color: #fab387;
+    color: #fe640b;
 }
 
 #tray {
@@ -104,7 +115,7 @@ tooltip label {
 
 @keyframes blink {
     to {
-        color: #1e1e2e;
-        background-color: #f38ba8;
+        color: #eff1f5;
+        background-color: #d20f39;
     }
 }

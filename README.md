@@ -16,6 +16,7 @@ huawei/.config/waybar/     Waybar status bar
 huawei/.config/rofi/       Rofi application launcher and window switcher
 huawei/.config/foot/       Foot terminal
 huawei/.config/dunst/      Dunst notifications
+huawei/.config/udiskie/    udiskie removable-drive tray indicator and automount
 legion/.config/hypr/       Hyprland, Hyprpaper, Hypridle, Hyprlock, scripts, wallpaper
 legion/.config/waybar/     Waybar status bar
 legion/.config/rofi/       Rofi application launcher and window switcher
@@ -36,6 +37,7 @@ cp -a huawei/.config/waybar ~/.config/
 cp -a huawei/.config/rofi ~/.config/
 cp -a huawei/.config/foot ~/.config/
 cp -a huawei/.config/dunst ~/.config/
+cp -a huawei/.config/udiskie ~/.config/
 ```
 
 Or install the Legion machine configuration with:

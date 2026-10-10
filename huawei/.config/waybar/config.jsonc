@@ -3,34 +3,91 @@
     "position": "top",
     "height": 34,
     "spacing": 4,
-    "margin-top": 8,
-    "margin-left": 8,
-    "margin-right": 8,
+    // "margin-top": 8,
+    // "margin-left": 8,
+    // "margin-right": 8,
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
-    "modules-center": ["clock"],
-    "modules-right": ["pulseaudio", "keyboard-state", "backlight", "battery", "memory", "cpu", "tray"],
+    "modules-center": [],
+    "modules-right": ["pulseaudio", "keyboard-state", "backlight", "battery", "memory", "cpu", "tray", "clock"],
 
+    // workspace number + dimmed short app tags of the windows it holds
     "hyprland/workspaces": {
-        "format": "{icon}",
-        "format-icons": {
-            "1": "1",
-            "2": "2",
-            "3": "3",
-            "4": "4",
-            "5": "5",
-            "6": "6",
-            "7": "7",
-            "8": "8",
-            "9": "9",
-            "10": "10",
-            "active": "",
-            "empty": "",
-            "persistent": "",
-            "special": ""
-        },
-        "on-click": "activate",
-        "on-scroll-up": "hyprctl dispatch workspace m-1",
-        "on-scroll-down": "hyprctl dispatch workspace m+1"
+        "format": "<b>{name}</b> <span size='small' alpha='85%'>{windows}</span>",
+        "format-window-separator": " ",
+        "window-rewrite-default": "{class}",
+        "window-rewrite": {
+            // AI 助手
+            "class<(Chatgpt|chatgpt)>": "chatgpt",
+            // 浏览器
+            "class<(google-chrome|Google-chrome)>": "chrome",
+            // 终端
+            "class<(foot|footclient)>": "foot",
+            "class<konsole>": "konsole",
+            "class<yakuake>": "yakuake",
+            // 编辑器 / IDE
+            "class<kate>": "kate",
+            "class<kwrite>": "kwrite",
+            "class<(code|com.microsoft.VSCode)>": "vscode",
+            "class<(nvim|nvim-qt)>": "nvim",
+            "class<(vim|gvim|Gvim)>": "vim",
+            // 文件管理 / 搜索 / 压缩
+            "class<doublecmd>": "doublecmd",
+            "class<dolphin>": "dolphin",
+            "class<krusader>": "krusader",
+            "class<(fsearch|io.github.cboxdoerfer.FSearch)>": "fsearch",
+            "class<ark>": "ark",
+            "class<peazip>": "peazip",
+            // 办公 / 文档
+            "class<wps>": "writer",
+            "class<et>": "spreadsheet",
+            "class<wpp>": "presentation",
+            "class<(pdf|wpspdf)>": "pdf",
+            "class<wpsoffice>": "wps",
+            "class<okular>": "okular",
+            "class<typora>": "typora",
+            "class<(calibre|ebook-edit|ebook-viewer)>": "calibre",
+            "class<pdfarranger>": "pdfarranger",
+            "class<(com.github.xournalpp.xournalpp|xournalpp)>": "xournal",
+            "class<docfetcher>": "docfetcher",
+            // 笔记
+            "class<md.obsidian.Obsidian>": "obsidian",
+            // 图像 / 截图
+            "class<(gimp|gimp-3.2)>": "gimp",
+            "class<krita>": "krita",
+            "class<darktable>": "darktable",
+            "class<digikam>": "digikam",
+            "class<gwenview>": "gwenview",
+            "class<showfoto>": "showfoto",
+            "class<gmic_qt>": "gmic",
+            "class<flameshot>": "flameshot",
+            "class<spectacle>": "spectacle",
+            // 影音
+            "class<vlc>": "vlc",
+            // 网络 / 代理 / 系统托盘类
+            "class<baidunetdisk>": "baidu",
+            "class<(flclash|com.follow.clash)>": "flclash",
+            "class<nm-connection-editor>": "network",
+            "class<(blueman-manager|blueman-adapters)>": "bluetooth",
+            "class<pavucontrol>": "volume",
+            "class<plasma-discover>": "discover",
+            // 即时通讯
+            "class<wechat>": "wechat",
+            "class<(workbuddy|WorkBuddy)>": "workbuddy",
+            "class<(QQ|linuxqq)>": "qq",
+            // 开发 / 系统工具
+            "class<cc-switch>": "ccswitch",
+            "class<designer6>": "designer",
+            "class<cmake-gui>": "cmake",
+            "class<kdiff3>": "kdiff3",
+            "class<krename>": "krename",
+            "class<(systemsettings|kcmshell6)>": "settings",
+            "class<plasma-systemmonitor>": "sysmon",
+            "class<kinfocenter>": "sysinfo",
+            "class<kfontview>": "fontview",
+            "class<pinentry-qt>": "pinentry",
+            "class<system-config-printer>": "printer",
+            "class<rofi>": "rofi"
+        }
     },
 
     "hyprland/window": {

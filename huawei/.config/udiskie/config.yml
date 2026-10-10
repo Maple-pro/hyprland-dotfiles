@@ -1,0 +1,31 @@
+# ---------------------------------------------------------------------------
+# udiskie —— 移动硬盘 / U 盘的挂载与托盘指示器
+#
+# 指示器 = waybar 的 tray 模块里的那个图标：
+#   已插入未挂载 / 已挂载，图标会自动变化；左键单击出菜单
+#   （挂载、卸载、浏览、安全弹出 / 断电），右键也可出菜单。
+#
+# 改完配置后重启生效：  pkill udiskie; udiskie &
+# 配置项完整列表：      man udiskie
+# ---------------------------------------------------------------------------
+
+program_options:
+  # 有系统托盘就显示图标（waybar 已提供 tray 模块）
+  tray: auto
+  # 插入后自动挂载到 /run/media/$USER/<卷标>
+  automount: true
+  # 挂载 / 卸载 / 插拔时弹通知（dunst）
+  notify: true
+  # 菜单里"浏览"用哪个文件管理器，例如 dolphin / doublecmd
+  # file_manager: dolphin
+  # 缓存认证密码，方便挂载需要提权的文件系统
+  # password_cache: true
+
+# 注意：本机 My Passport（/dev/sdc1, NTFS）被 Windows 标记为 dirty
+# （实际是"Windows 未完全关机 / 快速启动"留下的未清理状态），
+# 内核 ntfs3 会拒绝读写挂载，udisks2 也禁止传 force 选项：
+#   读写挂载 → Error mounting: wrong fs type, bad option, bad superblock
+#   只读挂载 → 正常（udisksctl mount -b /dev/sdc1 -o ro）
+# 想在 Windows 上继续用就先在 Windows 里 chkdsk / 关闭快速启动；
+# 在 Linux 上可以直接清标记（有风险，确认无 Windows 休眠数据后再执行）：
+#   sudo ntfsfix -d /dev/sdc1
