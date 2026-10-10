@@ -78,14 +78,14 @@ hyprctl reload
 
 ## Huawei theme layer
 
-The Huawei profile is on a light theme. Two different palettes are in play, and
-mixing them up is the usual source of "why is this window still dark":
+The Huawei profile is on a light theme. Three palettes are in play, and mixing
+them up is the usual source of "why is this window still dark":
 
 | Components | Palette |
 | --- | --- |
-| Hyprland borders, Waybar, Fcitx5 classic UI | Catppuccin Latte (light) |
+| Hyprland borders, Waybar, Fcitx5 classic UI, Dunst, Rofi | Catppuccin Latte (light) |
 | GTK3/GTK4, Qt/KDE apps, icons, cursors | Breeze Light + Papirus-Light |
-| Dunst, Hyprlock, Rofi, Foot | Catppuccin Mocha (dark, unchanged) |
+| Hyprlock, Foot | Catppuccin Mocha (dark, not yet converted) |
 
 Points to keep in mind:
 
