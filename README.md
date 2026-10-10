@@ -11,19 +11,27 @@ machines:
 ## Contents
 
 ```text
-huawei/.config/hypr/       Hyprland, Hyprpaper, Hypridle, Hyprlock, scripts, wallpaper
-huawei/.config/waybar/     Waybar status bar
-huawei/.config/rofi/       Rofi application launcher and window switcher
-huawei/.config/foot/       Foot terminal
-huawei/.config/dunst/      Dunst notifications
-huawei/.config/udiskie/    udiskie removable-drive tray indicator and automount
-legion/.config/hypr/       Hyprland, Hyprpaper, Hypridle, Hyprlock, scripts, wallpaper
-legion/.config/waybar/     Waybar status bar
-legion/.config/rofi/       Rofi application launcher and window switcher
-legion/.config/foot/       Foot terminal
-legion/.config/dunst/      Dunst notifications
-Hyprland_Guide.md   Basic usage guide
-install-hyprland.sh Package installer for the companion applications
+huawei/.config/hypr/                 Hyprland, Hyprpaper, Hypridle, Hyprlock, scripts, wallpaper
+huawei/.config/waybar/               Waybar status bar
+huawei/.config/rofi/                 Rofi application launcher and window switcher
+huawei/.config/foot/                 Foot terminal
+huawei/.config/dunst/                Dunst notifications
+huawei/.config/udiskie/              udiskie removable-drive tray indicator and automount
+huawei/.config/fcitx5/               Fcitx5 input method (pinyin, Catppuccin Latte classic UI)
+huawei/.local/share/fcitx5/themes/   Fcitx5 user theme "catppuccin-latte-purple"
+huawei/.config/gtk-3.0/              GTK3 Breeze-Light colours, decorations, window-button assets
+huawei/.config/gtk-4.0/              GTK4 settings (gtk.css symlinked into the system Breeze theme)
+huawei/.config/xsettingsd/           xsettingsd GTK/XSETTINGS daemon settings
+huawei/.config/nwg-look/             nwg-look export preferences (produced the GTK files above)
+huawei/.config/kdeglobals            KDE/Qt colour scheme and icon theme (Breeze Light)
+huawei/.config/gtkrc, gtkrc-2.0      KDE-generated GTK2 settings
+legion/.config/hypr/                 Hyprland, Hyprpaper, Hypridle, Hyprlock, scripts, wallpaper
+legion/.config/waybar/               Waybar status bar
+legion/.config/rofi/                 Rofi application launcher and window switcher
+legion/.config/foot/                 Foot terminal
+legion/.config/dunst/                Dunst notifications
+Hyprland_Guide.md                    Basic usage guide
+install-hyprland.sh                  Package installer for the companion applications
 ```
 
 ## Install configuration files
@@ -38,6 +46,18 @@ cp -a huawei/.config/rofi ~/.config/
 cp -a huawei/.config/foot ~/.config/
 cp -a huawei/.config/dunst ~/.config/
 cp -a huawei/.config/udiskie ~/.config/
+cp -a huawei/.config/fcitx5 ~/.config/
+cp -a huawei/.config/gtk-3.0 ~/.config/
+cp -a huawei/.config/gtk-4.0 ~/.config/
+cp -a huawei/.config/xsettingsd ~/.config/
+cp -a huawei/.config/nwg-look ~/.config/
+cp -a huawei/.config/kdeglobals ~/.config/
+cp -a huawei/.config/gtkrc huawei/.config/gtkrc-2.0 ~/.config/
+
+# Fcitx5 user theme (plain `catppuccin-latte-purple` is not shipped by fcitx5)
+mkdir -p ~/.local/share/fcitx5/themes
+cp -a huawei/.local/share/fcitx5/themes/catppuccin-latte-purple \
+      ~/.local/share/fcitx5/themes/
 ```
 
 Or install the Legion machine configuration with:
@@ -55,3 +75,39 @@ After copying or editing the Hyprland config, reload it with:
 ```bash
 hyprctl reload
 ```
+
+## Huawei theme layer
+
+The Huawei profile is on a light theme. Two different palettes are in play, and
+mixing them up is the usual source of "why is this window still dark":
+
+| Components | Palette |
+| --- | --- |
+| Hyprland borders, Waybar, Fcitx5 classic UI | Catppuccin Latte (light) |
+| GTK3/GTK4, Qt/KDE apps, icons, cursors | Breeze Light + Papirus-Light |
+| Dunst, Hyprlock, Rofi, Foot | Catppuccin Mocha (dark, unchanged) |
+
+Points to keep in mind:
+
+- Two settings live in dconf rather than in a file, so restore them by hand on
+  a fresh install:
+
+  ```bash
+  gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Light'
+  gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
+  ```
+
+- The GTK files are produced by nwg-look via KDE's `kde-gtk-config`
+  (`gtkconfig.so`). Changing colours or icons in KDE regenerates
+  `gtk-3.0/settings.ini` and `gtk-3.0/colors.css`, overwriting these copies.
+- `gtk-4.0/gtk.css` and `gtk-4.0/gtk-dark.css` are absolute symlinks into
+  `/usr/share/themes/Breeze/`. They dangle if that system theme is missing.
+- `gtk-4.0/assets/` is empty on the machine. Git cannot track empty
+  directories, and it is harmless: `gtk-4.0/gtk.css` is the Breeze symlink, so
+  `gtk-4.0/colors.css` and `gtk-4.0/window_decorations.css` are not imported.
+- `fcitx5/conf/cached_layouts` (a regenerated keyboard-layout cache) and
+  `fcitx5/conf/classicui.conf.bak` (a stale backup) are deliberately untracked.
+- `~/.gtkrc-2.0` sits outside `~/.config/` and is managed by nwg-look, so it is
+  not part of this profile. On the Huawei machine it still says
+  `gtk-icon-theme-name="Papirus-Dark"`, left over from the dark theme.
+
