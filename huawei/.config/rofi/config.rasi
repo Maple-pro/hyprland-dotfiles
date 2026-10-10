@@ -1,9 +1,10 @@
 configuration {
-    modi: "drun,run,window";
+    modi: "drun,run,window,keybinds:/home/yangfeng/.config/hypr/scripts/keybinds.lua";
     show-icons: true;
     display-drun: "Applications";
     display-run: "Run";
     display-window: "Windows";
+    display-keybinds: "Keybinds";
     drun-display-format: "{name}";
     location: 0;
     width: 36%;

@@ -9,6 +9,7 @@ local menu = "rofi -show drun"
 local browser = "google-chrome-stable"
 local editor = "kate"
 local powerMenu = "/home/yangfeng/.config/hypr/scripts/powermenu.sh"
+local keybindsHelp = "/home/yangfeng/.config/hypr/scripts/keybinds.lua"
 local mainMod = "SUPER"
 
 -- -----------------------------------------------------------------------------
@@ -382,6 +383,11 @@ hl.bind(
 )
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd(powerMenu))
+hl.bind(
+	mainMod .. " + SLASH",
+	hl.dsp.exec_cmd(keybindsHelp),
+	{ description = "Show keybind cheatsheet" }
+)
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("pkill -SIGUSR1 waybar"))
 hl.bind(mainMod .. " + ESCAPE", hl.dsp.exit())
 
