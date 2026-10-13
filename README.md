@@ -31,6 +31,7 @@ legion/.config/rofi/                 Rofi application launcher and window switch
 legion/.config/foot/                 Foot terminal
 legion/.config/dunst/                Dunst notifications
 huawei/install-hyprland.sh           Huawei package + configuration installer
+huawei/setup-mx150.sh                GeForce MX150 (580xx legacy) driver setup
 legion/install-hyprland.sh           Legion package + configuration installer
 Hyprland_Guide.md                    Basic usage guide
 ```
@@ -139,4 +140,35 @@ Points to keep in mind:
 - `~/.gtkrc-2.0` sits outside `~/.config/` and is managed by nwg-look, so it is
   not part of this profile. On the Huawei machine it still says
   `gtk-icon-theme-name="Papirus-Dark"`, left over from the dark theme.
+
+## Huawei GPU: GeForce MX150
+
+`huawei/setup-mx150.sh` records the fix for this machine's discrete GPU, which
+is not covered by `install-hyprland.sh` because it needs packages from the
+third-party **archlinuxcn** repository rather than the official ones.
+
+The MX150 (Pascal / GP108) is a legacy part: the unified 615 branch no longer
+drives it, so it needs the 580xx legacy branch. Before the fix the card had no
+kernel module at all — `nvidia-utils` had blacklisted `nouveau` while no NVIDIA
+module was ever installed, so `/sys/bus/pci/devices/0000:01:00.0/driver` did not
+exist and `nvidia-smi` failed outright.
+
+```bash
+sudo bash huawei/setup-mx150.sh
+```
+
+It installs `nvidia-580xx-dkms` / `nvidia-580xx-utils` (replacing the 615
+`nvidia-utils`), `dkms`, `linux-headers`, `nvidia-prime`, `envycontrol` and
+`nvtop`, rebuilds the initramfs, then self-checks and prints verification,
+troubleshooting and rollback steps.
+
+Status on the Huawei machine: applied and verified on 2026-10-12. DKMS reports
+`nvidia/580.178.04 installed`, `nvidia`, `nvidia_drm`, `nvidia_modeset` and
+`nvidia_uvm` are all loaded, and the bound driver version is `580.178.04`.
+Requires the archlinuxcn repository in `/etc/pacman.conf`:
+
+```ini
+[archlinuxcn]
+Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
+```
 

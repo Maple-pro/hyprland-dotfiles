@@ -277,5 +277,8 @@ ${BOLD}Next steps${RESET}
   * Hyprlock and Foot still use the dark Catppuccin Mocha palette while the
     rest of the profile is on Latte.
 
+  * The GeForce MX150 is not covered here: it needs the 580xx legacy branch
+    from the archlinuxcn repository. See setup-mx150.sh next to this script.
+
   * Reload after editing the Hyprland config:  hyprctl reload
 EOF
