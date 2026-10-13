@@ -152,6 +152,7 @@ PACKAGES=(
 
 	# applications the default keybindings launch
 	doublecmd-qt6
+	fsearch
 	kate
 )
 

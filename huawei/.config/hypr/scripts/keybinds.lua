@@ -171,6 +171,7 @@ local CMD_RULES = {
 	{ "google-chrome-stable", "Open browser (Chrome)", "Launch" },
 	{ "doublecmd", "Open file manager (Double Commander)", "Launch" },
 	{ "kate", "Open editor (Kate)", "Launch" },
+	{ "fsearch", "File search (FSearch)", "Launch" },
 	{ "foot", "Open terminal (foot)", "Launch" },
 
 	{ "movewindow l", "Move window left", "Window" },

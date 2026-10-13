@@ -8,6 +8,7 @@ local fileManager = "doublecmd"
 local menu = "rofi -show drun"
 local browser = "google-chrome-stable"
 local editor = "kate"
+local fileSearch = "fsearch"
 local powerMenu = "/home/yangfeng/.config/hypr/scripts/powermenu.sh"
 local keybindsHelp = "/home/yangfeng/.config/hypr/scripts/keybinds.lua"
 local mainMod = "SUPER"
@@ -365,6 +366,7 @@ hl.bind(mainMod .. " + TAB", hl.dsp.exec_cmd("rofi -show window"))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd(editor))
+hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(fileSearch), { description = "File search (FSearch)" })
 
 -- Window control
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
