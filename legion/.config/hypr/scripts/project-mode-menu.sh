@@ -35,10 +35,10 @@ MODE_LUA="$HOME_DIR/.config/hypr/scripts/project-mode.lua"
 MODES=(pc-only mirror extend external)
 BUILTIN=(internal mirror extend external)
 LABELS=(
-	"仅电脑屏幕 PC screen only"
-	"复制 Duplicate"
-	"扩展 Extend"
-	"仅投影仪 Second screen only"
+	"PC screen only"
+	"Duplicate"
+	"Extend"
+	"Second screen only"
 )
 
 entries=()
@@ -77,7 +77,7 @@ collect() {
 
 # rofi script modus 的列表输出：\0 开头的是给 rofi 的元信息，后面才是条目
 render() {
-	printf '\0prompt\x1f投影模式\n'
+	printf '\0prompt\x1fProjection\n'
 	printf '\0no-custom\x1ftrue\n'
 	printf '%s\n' "${entries[@]}"
 }
@@ -117,6 +117,6 @@ if [ -n "${ROFI_RETV:-}" ]; then
 fi
 
 # ---- 直接运行：自己弹一个 rofi -dmenu ----
-choice=$(render | rofi -dmenu -i -p "投影模式")
+choice=$(render | rofi -dmenu -i -p "Projection")
 [ -n "${choice:-}" ] || exit 0
 apply "$choice" || true

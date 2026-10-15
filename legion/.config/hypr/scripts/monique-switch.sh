@@ -34,7 +34,7 @@ ipc = detect_backend()
 monitors = ipc.get_monitors()
 if name != "pc-only" and not any(not m.name.startswith(("eDP-", "LVDS-")) for m in monitors):
     import subprocess
-    subprocess.run(["notify-send", "投影模式", "请先连接外接显示器"], check=False)
+    subprocess.run(["notify-send", "Projection", "Connect an external display first"], check=False)
     raise SystemExit("No external display connected; keeping the laptop panel enabled")
 connected = sorted(m.description for m in monitors if m.description)
 # Projection switching manages the user session, not privileged login screens.

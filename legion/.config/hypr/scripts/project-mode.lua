@@ -51,10 +51,10 @@ M.order = { "internal", "mirror", "extend", "external" }
 M.default = "internal"
 
 M.labels = {
-	internal = "仅电脑屏幕 PC screen only",
-	mirror = "复制 Duplicate",
-	extend = "扩展 Extend",
-	external = "仅投影仪 Second screen only",
+	internal = "PC screen only",
+	mirror = "Duplicate",
+	extend = "Extend",
+	external = "Second screen only",
 }
 
 -- 装了 monique 之后，布局由它的档案接管（见 hyprland.lua 里 include 的 monitors.lua）：
@@ -187,7 +187,7 @@ end
 -- 用 Hyprland 自带的 OSD（hl.notification），不依赖 dunst / 通知守护进程；
 -- 万一旧版 Hyprland 没有这个 API，再退回 notify-send。
 function M.notify(mode)
-	local lines = { "投影模式 Projection", "" }
+	local lines = { "Projection", "" }
 	for _, m in ipairs(M.order) do
 		lines[#lines + 1] = (m == mode and "● " or "○ ") .. M.labels[m]
 	end
@@ -205,7 +205,7 @@ function M.notify(mode)
 		_G.__hypr_project_mode_osd = api.notification.create({ text = text, timeout = 2000, icon = 1 })
 	else
 		api.exec_cmd(
-			"notify-send -a Hyprland -i video-display -t 2000 '投影模式' '"
+			"notify-send -a Hyprland -i video-display -t 2000 'Projection' '"
 				.. text:gsub("'", "'\\''")
 				.. "'"
 		)
