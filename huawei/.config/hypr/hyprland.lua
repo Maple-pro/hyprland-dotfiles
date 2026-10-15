@@ -11,6 +11,9 @@ local editor = "kate"
 local fileSearch = "fsearch"
 local powerMenu = "/home/yangfeng/.config/hypr/scripts/powermenu.sh"
 local keybindsHelp = "/home/yangfeng/.config/hypr/scripts/keybinds.lua"
+local projectMode = "/home/yangfeng/.config/hypr/scripts/project-mode.lua"
+-- 重启 waybar 统一走这个脚本：带 flock 串行 + 等旧进程退出，避免同时起两个实例
+local waybarRestart = "/home/yangfeng/.config/hypr/scripts/restart-waybar.sh"
 local mainMod = "SUPER"
 
 -- -----------------------------------------------------------------------------
@@ -31,32 +34,266 @@ hl.env("HYPRCURSOR_SIZE", "24")
 hl.env("GTK_IM_MODULE", "")
 
 -- -----------------------------------------------------------------------------
--- Monitors
+-- Monitors / 投影模式（Super+P 循环，等价于 Windows 的 Win+P）
 -- -----------------------------------------------------------------------------
--- Laptop panel (eDP-1): stays at the origin, i.e. the RIGHT-hand screen.
-hl.monitor({
-	output = "eDP-1",
-	mode = "preferred",
-	position = "0x0",
-	scale = 1,
-})
+-- 显示器规则的来源，二选一（Hyprland 对同一个输出只采用第一条匹配的规则，
+-- 所以两套规则绝不能同时发出去）：
+--   1) monique 生成的 ~/.config/hypr/monitors.lua —— GUI 点 Apply 或
+--      `monique --switch-profile <档案>` 写入，档案在 ~/.config/monique/profiles/
+--      （pc-only / mirror / extend / external，按显示器描述匹配）
+--   2) 内置兜底：scripts/project-mode.lua（monique 没装或还没建档案时按端口名配）
+local monitorsLua = "/home/yangfeng/.config/hypr/monitors.lua"
 
--- External screen (HDMI-A-1): placed to the LEFT of every other output.
--- auto-left keeps the layout gap-free when the external screen is unplugged.
-hl.monitor({
-	output = "HDMI-A-1",
-	mode = "1920x1080@60",
-	position = "auto-left",
-	scale = 1,
-})
+-- 读出 monique 的配置，解析其中的 workspace_rule，再用注入了 hl 的环境执行
+-- （本文件里的 hl 在 keybinds.lua 速查表的沙箱中是桩对象，而 dofile 用默认全局
+-- 环境，直接 dofile 会让沙箱里取不到 hl）。
+local workspaceRules = {}
+-- 本轮配置里"正在镜像别人的输出"（例如 mirror 档案里的 HDMI-A-1），
+-- 用于检测"离开镜像模式"，见下面的 heal_outputs_that_left_mirror
+local mirroredOutputs = {}
 
--- Fallback for any other output.
+local function load_monique_config()
+	local f = io.open(monitorsLua, "r")
+	if not f then
+		return false
+	end
+	local src = f:read("*a") or ""
+	f:close()
+
+	-- 每次加载都重新解析：这两张表是"本轮配置"的快照，
+	-- 不清空的话会跨 reload 累加，切换档案后残留上一份的规则。
+	workspaceRules = {}
+	mirroredOutputs = {}
+
+	for block in src:gmatch("workspace_rule%s*%((.-)%)") do
+		local ws = block:match('workspace%s*=%s*"([^"]+)"')
+		local mon = block:match('monitor%s*=%s*"([^"]+)"')
+		if ws and mon then
+			workspaceRules[#workspaceRules + 1] = { workspace = ws, monitor = mon }
+		end
+	end
+
+	for block in src:gmatch("hl%.monitor%s*%((.-)%)") do
+		local output = block:match('output%s*=%s*"([^"]*)"')
+		local mirror = block:match('mirror%s*=%s*"([^"]*)"')
+		if output and output ~= "" and mirror and mirror ~= "" then
+			mirroredOutputs[output] = true
+		end
+	end
+
+	local chunk = load(src, "@" .. monitorsLua, "t", setmetatable({ hl = hl }, { __index = _G }))
+	if not chunk then
+		return false
+	end
+	return pcall(chunk)
+end
+
+local okProjectMode, ProjectMode = pcall(dofile, projectMode)
+
+if load_monique_config() then
+	-- monique 接管显示器规则
+elseif okProjectMode and type(ProjectMode) == "table" and ProjectMode.attach then
+	-- attach 把本文件环境里的 hl 交给模块
+	ProjectMode.attach(hl).apply(ProjectMode.read(), { save = false })
+else
+	okProjectMode = false
+	-- 回退：模块加载失败时，至少保证笔记本内屏可用 + 外接屏复制
+	hl.monitor({
+		output = "eDP-1",
+		mode = "preferred",
+		position = "0x0",
+		scale = 1,
+		disabled = false,
+		mirror = "",
+	})
+	hl.monitor({
+		output = "HDMI-A-1",
+		mode = "1920x1080@60",
+		position = "auto",
+		scale = 1,
+		disabled = false,
+		mirror = "eDP-1",
+	})
+end
+
+-- Fallback for any other output：默认「复制」。
+-- 没被任何档案/规则单独指到的输出（比如插了另一块屏、档案里的端口名对不上）
+-- 一律镜像 eDP-1，避免"以为在复制、结果桌面被扩展出去"。
+-- 具体规则（monique 档案里按 eDP-1 / HDMI-A-1 写的那些）排在前面，优先级更高。
 hl.monitor({
 	output = "",
 	mode = "preferred",
 	position = "auto",
 	scale = 1,
+	mirror = "eDP-1",
 })
+
+-- -----------------------------------------------------------------------------
+-- 工作区归属：扩展模式时主屏（eDP-1）只保留 workspace 1
+-- -----------------------------------------------------------------------------
+-- monique 档案里声明的 workspace_rule 只保证"新建"的工作区落在指定屏幕上
+-- （实测：切换档案后新建的 ws9/ws10 自动落到外接屏，已存在的 ws5/ws6 不会自己搬），
+-- 所以这里在启动 / 配置重载 / 显示器变化时按档案声明的归属校正一次：
+-- 声明归谁，就真的待在谁的屏上。mirror / pc-only / external 档案没有工作区规则，
+-- 这段就完全不动（否则工作区会被困在已关闭的屏幕上）。
+local function enforce_workspace_ownership()
+	if #workspaceRules == 0 then
+		return
+	end
+
+	-- 规则里的显示器写的是 desc:描述，翻译成当前实际存在的输出名
+	local name_of = {}
+	for _, mon in ipairs(hl.get_monitors() or {}) do
+		if mon.name then
+			name_of[mon.name] = mon.name
+			if mon.description then
+				name_of["desc:" .. mon.description] = mon.name
+			end
+		end
+	end
+
+	local current = {}
+	for _, ws in ipairs(hl.get_workspaces() or {}) do
+		current[ws.id] = ws
+	end
+
+	for _, rule in ipairs(workspaceRules) do
+		local target = name_of[rule.monitor]
+		local id = tonumber(rule.workspace)
+		if target and id then
+			local ws = current[id]
+			local where = ws and ws.monitor and ws.monitor.name
+			if where and where ~= target then
+				hl.dispatch(hl.dsp.workspace.move({ workspace = rule.workspace, monitor = target }))
+			end
+		end
+	end
+end
+
+-- 镜像输出上的工作区要救回来：复制模式下那块屏画的是源屏的内容，
+-- 而扩展模式留在它下面的工作区（ws2-10）就变成"调不出来"——既不在主屏，
+-- 也不在镜像屏上显示。把这些工作区搬回非镜像的源屏。
+local function rescue_workspaces_from_mirrors()
+	local fallback = nil
+	for _, mon in ipairs(hl.get_monitors() or {}) do
+		if not mon.is_mirror then
+			fallback = fallback or mon
+		end
+	end
+	if not fallback then
+		return
+	end
+
+	for _, ws in ipairs(hl.get_workspaces() or {}) do
+		local where = ws.monitor
+		if where and where.is_mirror then
+			hl.dispatch(hl.dsp.workspace.move({ workspace = tostring(ws.id), monitor = fallback.name }))
+		end
+	end
+end
+
+-- 显示器变化后的处理（工作区归属校正、镜像救援、waybar 补建、镜像后遗症自愈）。
+--
+-- 跨 reload 的状态只能落盘：hyprctl reload 会把 Lua 状态整个重置（连 _G 里的全局
+-- 都会没），所以监听器里读不到上一轮的 local / global。这里把"上次哪些输出在镜像"
+-- 和"上次的布局签名"记在一个小文件里。
+local stateFile = (os.getenv("HOME") or "/tmp") .. "/.cache/hypr/monitor-state"
+
+local function read_state()
+	local mirrors, signature = {}, nil
+	local f = io.open(stateFile, "r")
+	if not f then
+		return mirrors, signature
+	end
+	for line in f:lines() do
+		local key, value = line:match("^(%S+)%s+(.+)$")
+		if key == "mirror" then
+			mirrors[value] = true
+		elseif key == "signature" then
+			signature = value
+		end
+	end
+	f:close()
+	return mirrors, signature
+end
+
+local function write_state(signature)
+	local dir = stateFile:match("^(.*)/[^/]+$")
+	if dir then
+		pcall(os.execute, "mkdir -p '" .. dir .. "'")
+	end
+	local f = io.open(stateFile, "w")
+	if not f then
+		return
+	end
+	for name in pairs(mirroredOutputs) do
+		f:write("mirror ", name, "\n")
+	end
+	if signature then
+		f:write("signature ", signature, "\n")
+	end
+	f:close()
+end
+
+-- 布局指纹：谁在哪、是不是镜像。用于判断"布局真的变了"，避免每次 reload 都重启 waybar
+local function monitor_signature()
+	local parts = {}
+	for _, mon in ipairs(hl.get_monitors() or {}) do
+		parts[#parts + 1] = string.format(
+			"%s:%d:%d:%s",
+			mon.name or "?",
+			mon.x or 0,
+			mon.y or 0,
+			mon.is_mirror and "mirror" or "own"
+		)
+	end
+	table.sort(parts)
+	return table.concat(parts, ",")
+end
+
+local function on_monitors_changed()
+	local previousMirrors, previousSignature = read_state()
+	local signature = monitor_signature()
+
+	-- 离开镜像模式：这块输出当过镜像，Hyprland 有时不会重建它的 wl_output
+	-- （客户端完全看不到它，waybar 就永远不在上面画 bar，重启 waybar 也没用）。
+	-- 唯一可靠的办法是让它走一遍"禁用 → 启用"。
+	local to_heal = {}
+	for name in pairs(previousMirrors) do
+		if not mirroredOutputs[name] then
+			to_heal[#to_heal + 1] = name
+		end
+	end
+	write_state(signature)
+
+	if #to_heal > 0 then
+		for _, name in ipairs(to_heal) do
+			hl.monitor({ output = name, disabled = true })
+		end
+		hl.timer(function()
+			-- reload 按档案把它重新打开，随后重启 waybar 让它在新输出上建 bar
+			hl.exec_cmd("hyprctl reload; sleep 1; '" .. waybarRestart .. "'")
+		end, { timeout = 700, type = "oneshot" })
+		return
+	end
+
+	enforce_workspace_ownership()
+	rescue_workspaces_from_mirrors()
+
+	if previousSignature and signature ~= previousSignature then
+		hl.exec_cmd("'" .. waybarRestart .. "'")
+	end
+end
+
+-- 这些事件都会在显示器布局变化时触发。监听器不需要手工清理：
+-- 每次 reload 都是全新的 Lua 状态，旧的监听器会随之消失。
+for _, event in ipairs({
+	"config.reloaded",
+	"monitor.added",
+	"monitor.layout_changed",
+}) do
+	hl.on(event, on_monitors_changed)
+end
 
 -- -----------------------------------------------------------------------------
 -- Autostart
@@ -372,8 +609,22 @@ hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(fileSearch), { description = "File se
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
+-- 伪平铺原来在 Super+P，让位给「投影模式」后改到 Super+Shift+P
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.window.pseudo(), { description = "Toggle pseudo-tiling (was Super+P)" })
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
+
+-- 投影模式：Super+P 弹 rofi 菜单直接选（仅电脑屏幕 / 复制 / 扩展 / 仅投影仪），
+-- 当前模式在菜单里用 ● 标出。切换走 scripts/monique-switch.sh（先写 pin 再切），
+-- 离开镜像模式后的 wl_output 重建 / waybar 补建由上面的显示器钩子负责。
+-- 想回到"按一下切下一个"的循环方式，把下面换成：
+--   hl.dsp.exec_cmd("hyprctl eval 'dofile(\"" .. projectMode .. "\").cycle()'")
+-- rofi -show project 用的是 config.rasi 里注册的 project 这个 modus；
+-- 它同时也是 rofi 里的 Ctrl+Tab（kb-mode-next）能切到的那个 "Projection"。
+hl.bind(
+	mainMod .. " + P",
+	hl.dsp.exec_cmd("rofi -show project"),
+	{ description = "Projection mode menu (also Ctrl+Tab inside rofi)" }
+)
 
 -- Utilities
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy'))
