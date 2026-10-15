@@ -1,0 +1,20 @@
+# -----------------------------------------------------------------------------
+# monique runtime state
+#
+# These files are rewritten by monique on every Apply and every profile switch,
+# so tracking them would dirty the working tree constantly:
+#
+#   monitors.lua  the generated monitor rules that hyprland.lua loads; monique
+#                 writes it when it applies a profile
+#   settings.json the pinned profile, the active profile and the fingerprint of
+#                 the monitors that were connected
+#
+# The real configuration — the four profile definitions in
+# huawei/.config/monique/profiles/ — IS tracked.
+#
+# hyprland.lua reads monitors.lua when it exists and falls back to
+# hypr/scripts/project-mode.lua when it does not, so a clone with neither file
+# still starts correctly.
+# -----------------------------------------------------------------------------
+/huawei/.config/hypr/monitors.lua
+/huawei/.config/monique/settings.json
