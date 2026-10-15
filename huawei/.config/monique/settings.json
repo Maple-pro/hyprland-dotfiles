@@ -1,12 +1,12 @@
 {
   "pinned_profile": {
-    "name": "extend",
+    "name": "external",
     "fingerprint": [
       "California Institute of Technology 0x142E",
       "TFC TF24P2-FIH0 323EBGJ106057"
     ]
   },
-  "active_profile": "extend",
+  "active_profile": "external",
   "hypr_config_format": "lua",
   "use_port_names": true
 }

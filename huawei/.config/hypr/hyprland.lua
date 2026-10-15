@@ -475,44 +475,94 @@ hl.config({
 -- Fixed workspaces for daily-use apps.
 -- The "silent" suffix moves the window to its workspace without dragging the
 -- current view along, so launching an app never steals your focus.
-hl.window_rule({
-	name = "ws-wechat",
-	match = { class = "^(wechat|WeChat)$" },
-	workspace = "1 silent",
-})
+--
+-- 这张表是"应用默认工作区"的唯一来源，两处用它：
+--   1) 下面的 window_rule 把新建窗口直接放到默认工作区；
+--   2) 再下面的 window.open 监听器负责"弹窗跟随应用"（见那里的注释）。
+-- classes 里写应用真实的窗口 class（`hyprctl clients` 里的 class 字段），
+-- 匹配用的正则由它生成；加应用/改 class 只动这张表。
+local fixedWorkspaceApps = {
+	{ name = "ws-wechat", workspace = 1, classes = { "wechat", "WeChat" } },
+	{ name = "ws-doublecmd", workspace = 2, classes = { "doublecmd", "doublecmd-qt6", "doublecmd-qt", "Double Commander" } },
+	{ name = "ws-chrome", workspace = 3, classes = { "google-chrome", "Google-chrome" } },
+	-- WPS 表格 (Spreadsheets)
+	{ name = "ws-spreadsheet", workspace = 4, classes = { "et" } },
+	-- WPS 文字 (Writer) 与 WPS PDF（运行时窗口类是 "pdf"）
+	{ name = "ws-word", workspace = 5, classes = { "wps" } },
+	{ name = "ws-pdf", workspace = 5, classes = { "pdf", "wpspdf" } },
+}
 
-hl.window_rule({
-	name = "ws-doublecmd",
-	match = { class = "^(doublecmd|doublecmd-qt6|doublecmd-qt|Double Commander)$" },
-	workspace = "2 silent",
-})
+-- class -> 默认工作区，监听器用它判断"这个窗口属不属于设了默认工作区的应用"
+local defaultWorkspaceOfClass = {}
 
-hl.window_rule({
-	name = "ws-chrome",
-	match = { class = "^(google-chrome|Google-chrome)$" },
-	workspace = "3 silent",
-})
+-- Hyprland 用 ECMAScript 正则匹配 class，这里把元字符转义后再拼成 ^(a|b)$
+local function class_regex(classes)
+	local parts = {}
+	for _, class in ipairs(classes) do
+		parts[#parts + 1] = (class:gsub("([%^%$%(%)%.%[%]%*%+%-%?%{%}%|%/])", "\\%1"))
+	end
+	if #parts == 1 then
+		return "^" .. parts[1] .. "$"
+	end
+	return "^(" .. table.concat(parts, "|") .. ")$"
+end
 
--- WPS 表格 (Spreadsheets)
-hl.window_rule({
-	name = "ws-spreadsheet",
-	match = { class = "^et$" },
-	workspace = "4 silent",
-})
+for _, app in ipairs(fixedWorkspaceApps) do
+	hl.window_rule({
+		name = app.name,
+		match = { class = class_regex(app.classes) },
+		workspace = app.workspace .. " silent",
+	})
 
--- WPS 文字 (Writer)
-hl.window_rule({
-	name = "ws-word",
-	match = { class = "^wps$" },
-	workspace = "5 silent",
-})
+	for _, class in ipairs(app.classes) do
+		defaultWorkspaceOfClass[class] = app.workspace
+	end
+end
 
--- WPS PDF (运行时窗口类是 "pdf"，桌面项的 StartupWMClass 是 "wpspdf")
-hl.window_rule({
-	name = "ws-pdf",
-	match = { class = "^(pdf|wpspdf)$" },
-	workspace = "5 silent",
-})
+-- 弹窗跟随应用。
+-- 规则按 class 把窗口放到默认工作区，但保存文件 / 打开 / 选字体 / 转发信息这类弹窗
+-- 和主窗口共用同一个 class，于是即使用户已经把应用挪到别的工作区，弹窗还是会被规则
+-- 送回默认工作区。
+-- 这里的规则很简单：
+--   * 已经有同类窗口"打开着" -> 新窗口去它所在的工作区（有多个时优先当前活动工作区，
+--     弹窗的父窗口通常就在那儿）；
+--   * 一个同类窗口都没有（应用刚启动的第一扇窗）-> 不动它，交给上面的规则放默认工作区。
+-- window.open 在 Hyprland 里是 mapWindow 的最后一步（工作区规则和布局都已处理完），
+-- 此时再挪一次是安全的。
+local function workspace_of_open_window(w)
+	local active = hl.get_active_workspace()
+	local fallback = nil
+
+	for _, other in ipairs(hl.get_windows() or {}) do
+		if other ~= w and other.class == w.class and other.workspace then
+			if active and other.workspace.id == active.id then
+				return other.workspace
+			end
+			fallback = fallback or other.workspace
+		end
+	end
+
+	return fallback
+end
+
+hl.on("window.open", function(w)
+	if not w or defaultWorkspaceOfClass[w.class] == nil then
+		return
+	end
+
+	local target = workspace_of_open_window(w)
+	local current = w.workspace
+	if not target or not current or target.id == current.id then
+		return
+	end
+
+	-- follow = false：只搬窗口，不切视图（跟规则里的 "silent" 一致）
+	hl.dispatch(hl.dsp.window.move({
+		window = w,
+		workspace = tostring(target.id),
+		follow = false,
+	}))
+end)
 
 -- FSearch: floating search palette instead of a tiled window.
 hl.window_rule({
