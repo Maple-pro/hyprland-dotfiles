@@ -28,7 +28,8 @@ huawei/.config/kdeglobals            KDE/Qt colour scheme and icon theme (Breeze
 huawei/.config/gtkrc, gtkrc-2.0      KDE-generated GTK2 settings
 legion/.config/hypr/                 Hyprland, Hyprpaper, Hypridle, Hyprlock, scripts, wallpaper
 legion/.config/waybar/               Waybar status bar
-legion/.config/rofi/                 Rofi application launcher and window switcher
+legion/.config/rofi/                 Rofi launcher, keybind cheatsheet and projection menu
+legion/.config/monique/profiles/     Legion projection profiles
 legion/.config/foot/                 Foot terminal
 legion/.config/dunst/                Dunst notifications
 huawei/install-hyprland.sh           Huawei package + configuration installer
@@ -107,6 +108,47 @@ cp -a legion/.config/dunst ~/.config/
 The manual copies merge into existing directories rather than replacing them, so
 files that a profile has since dropped are left behind. The installers behave
 the same way; only the backup protects you there.
+
+## Legion shortcuts and projection modes
+
+- **Super+/** opens the Rofi cheatsheet, reading the current Lua configuration
+  (including loop-generated bindings). It replaces the old HotKeyHub command.
+- **Super+A** opens FSearch as a floating search window.
+- **Super+P** opens the four-mode projection menu; pseudo-tiling moves to
+  **Super+Shift+P**. Ctrl+Tab inside Rofi also reaches the projection menu.
+- New app windows default to WeChat workspace 1, Krusader 2, Chrome 3,
+  WPS spreadsheets 4, WPS Writer/PDF 5. Later windows of the same class follow
+  an existing window, preferring the active workspace; this includes dialogs
+  and additional main windows. Existing windows are not relocated on reload.
+
+The Legion panel stays at **2560×1600@60, scale 1.25**. Projection profiles
+use the external display's preferred mode at scale 1. In extend mode the
+external display is to the left, with workspaces 2–10; workspace 1 stays on
+the panel. The initial profile is `pc-only`.
+
+Install Monique from the AUR (`yay -S monique`) or from its official source.
+On this machine Monique is installed through `yay` and managed by pacman;
+helpers use the system `python3` and `monique` commands.
+
+`hypr/scripts/monique-profiles.py --ensure` builds the four profiles when the
+menu opens or a mode is selected, using actual monitor identities. A new
+external display causes the generated profiles to be rebuilt; edits are kept
+when the hardware identity is unchanged. Run without `--ensure` to explicitly
+rebuild. With no external display connected, the definitions contain an
+HDMI placeholder using its preferred mode; the switch wrapper refuses all
+modes except `pc-only` until a real external display is detected. The fallback
+Lua module starts in internal-only mode on a fresh installation.
+
+Switching sets Monique to Lua output and disables login-screen updates, so it
+needs no administrator authentication. Monique GUI also uses these saved
+preferences. The hotplug daemon is not required for the menu and is not
+automatically enabled. Waybar recovery calls Legion's `start-waybar.sh` to
+preserve its GTK isolation, and releases the restart lock before launching it.
+
+`hypr/monitors.lua` and `monique/settings.json` are generated state and ignored;
+only profile definitions are tracked. Monique changes `last_applied_time` in
+those profiles; timestamp-only differences do not need syncing. Back up local
+profiles before deploying the repository copies again.
 
 ## Huawei projection modes (Super+P)
 

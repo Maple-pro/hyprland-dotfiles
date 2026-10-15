@@ -153,13 +153,20 @@ PACKAGES=(
 	ttf-nerd-fonts-symbols
 	noto-fonts-emoji
 
+	# Lua cheatsheet and Monique profile helpers
+	lua
+	python
+	util-linux
+
 	# applications the default keybindings launch
+	fsearch
 	krusader
 	kate
 )
 
 # Deliberately not in PACKAGES: not available in the official repositories.
 UNAVAILABLE=(
+	"monique         AUR — Super+P monitor profiles and graphical editor"
 	"google-chrome    AUR — SUPER + B launches google-chrome-stable"
 	"mihomo-party     AUR / third-party — the waybar 'clash' module, its on-click,"
 	"                 the clash-party.sh script and an autostart line all expect"
@@ -177,6 +184,7 @@ ENTRIES=(
 	.config/hypr
 	.config/waybar
 	.config/rofi
+	.config/monique/profiles
 	.config/foot
 	.config/dunst
 )

@@ -18,3 +18,7 @@
 # -----------------------------------------------------------------------------
 /huawei/.config/hypr/monitors.lua
 /huawei/.config/monique/settings.json
+
+# Legion Monique generated state (authored profile definitions stay tracked).
+/legion/.config/hypr/monitors.lua
+/legion/.config/monique/settings.json
