@@ -75,26 +75,7 @@ apply_hyprland() {
 }
 
 restart_waybar() {
-    local marker="${TMPDIR:-/tmp}/waybar-rounding-restart.ts"
-    local now last
-
-    now="$(date +%s)"
-    if [[ -f "${marker}" ]]; then
-        last="$(cat "${marker}" 2>/dev/null || echo 0)"
-        if (( now - last < 2 )); then
-            return 0
-        fi
-    fi
-    date +%s > "${marker}"
-
-    pkill -x waybar 2>/dev/null || true
-    sleep 0.2
-
-    if command -v hyprctl >/dev/null 2>&1; then
-        hyprctl dispatch exec "${HOME}/.config/hypr/scripts/start-waybar.sh" >/dev/null 2>&1 || { nohup "${HOME}/.config/hypr/scripts/start-waybar.sh" >/dev/null 2>&1 & }
-    else
-        nohup "${HOME}/.config/hypr/scripts/start-waybar.sh" >/dev/null 2>&1 &
-    fi
+    "${HOME}/.config/hypr/scripts/restart-waybar.sh"
 }
 
 notify_mode() {

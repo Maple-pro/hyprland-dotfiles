@@ -16,6 +16,7 @@
         "format-window-separator": " ",
         "window-rewrite-default": "{class}",
         "window-rewrite": {
+            "class<([Ff]citx.*|org[.]fcitx[.].*)>": "",
             "class<(Chatgpt|chatgpt)>": "chatgpt",
             "class<(google-chrome|Google-chrome)>": "chrome",
             "class<(foot|footclient)>": "foot",
