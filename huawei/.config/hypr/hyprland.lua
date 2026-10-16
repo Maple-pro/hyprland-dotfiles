@@ -37,6 +37,20 @@ hl.env("HYPRCURSOR_SIZE", "24")
 -- GTK 应用走 fcitx5-gtk 的 D-Bus 模块，portal 对话框也能正常切输入法。
 hl.env("GTK_IM_MODULE", "fcitx")
 
+-- 输入法相关的其余变量，统一在这里声明（不再依赖 /etc/environment）：
+--   XMODIFIERS   : X11 / XWayland 应用走 XIM 时用（fcitx5 的 xim 前端）
+--   QT_IM_MODULE : Qt5/Qt6 走 fcitx5-qt 的模块（Qt6 也可用 wayland 走 text-input-v3，
+--                  这里与系统其它部分保持一致）
+--   SDL_IM_MODULE: 给 SDL 应用走 XIM 用。本机 libSDL2 其实是 sdl2-compat（套 SDL3），
+--                  该变量由底层 libSDL3 读取，值写 fcitx（与 XMODIFIERS 的 @im=fcitx 一致）；
+--                  SDL3 在原生 Wayland 下另有 text-input-v3 通路
+--   GLFW_IM_MODULE: GLFW 只认 "ibus"（它没有 fcitx 支持），而 fcitx5 自带 ibus 前端
+--                  （实测 org.freedesktop.IBus 由 fcitx5 持有），所以这里必须是 ibus
+hl.env("XMODIFIERS", "@im=fcitx")
+hl.env("QT_IM_MODULE", "fcitx")
+hl.env("SDL_IM_MODULE", "fcitx")
+hl.env("GLFW_IM_MODULE", "ibus")
+
 -- -----------------------------------------------------------------------------
 -- Monitors / 投影模式（Super+P 循环，等价于 Windows 的 Win+P）
 -- -----------------------------------------------------------------------------
