@@ -252,6 +252,15 @@ local function monitor_signature()
 end
 
 local function on_monitors_changed()
+	-- 配置加载阶段的 config.reloaded 会在显示器还没枚举出来时先触发一次，
+	-- 这时 hl.get_monitors() 是空的：签名算出空串，跟上次会话存档的签名必然不同，
+	-- 于是白重启一次 waybar；紧接着 hyprland.start 又按自启动拉起第二个
+	-- → 屏幕上就是两条 bar 叠在一起（开机两个 waybar 的根因）。
+	-- 空布局没有任何东西要校正，直接返回；也不要写存档，否则会把上次的签名冲掉。
+	if #(hl.get_monitors() or {}) == 0 then
+		return
+	end
+
 	local previousMirrors, previousSignature = read_state()
 	local signature = monitor_signature()
 
@@ -301,7 +310,10 @@ end
 hl.on("hyprland.start", function()
 	hl.exec_cmd("dbus-update-activation-environment --systemd --all")
 	hl.exec_cmd("hyprpaper")
-	hl.exec_cmd("waybar")
+	-- waybar 不直接起：所有拉起 waybar 的地方都走 restart 脚本（flock 串行 + 先杀后起），
+	-- 这样即使自启动和显示器钩子在同一秒都想拉起它，最终也只会留下一个实例。
+	-- （之前这里写的是 hl.exec_cmd("waybar")，跟布局钩子那次重启撞在一起就是两个 waybar。）
+	hl.exec_cmd("'" .. waybarRestart .. "'")
 	hl.exec_cmd("dunst")
 	hl.exec_cmd("hyprpolkitagent")
 	hl.exec_cmd("hypridle")
