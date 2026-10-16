@@ -274,8 +274,19 @@ end
 -- Hyprland 会留一个名为 FALLBACK 的虚拟输出（disabled=false），物理屏却仍然是黑的，
 -- 所以判断"还有没有屏幕在用"必须忽略 FALLBACK —— 只按名字看。
 -- moniqued 自身也有兜底，但要等它服务起来（几秒甚至更久），这里立即补一次。
+--
+-- 空列表 ≠ 黑屏：config.reloaded 会在输出枚举完成前先触发一次（见下面
+-- on_monitors_changed 里的同名判断），此时 get_monitors() 就是空的。
+-- 真正"全关"时 Hyprland 至少会留一个 FALLBACK，所以空表必须原样交给
+-- 空列表守卫，不能在这里当黑屏抢救 —— 否则每次 reload 都会强开 eDP-1、
+-- 额外重启一次 waybar、并弹出与事实不符的 OSD。
 local function rescue_black_screen()
-	for _, mon in ipairs(hl.get_monitors() or {}) do
+	local live_outputs = hl.get_monitors() or {}
+	if #live_outputs == 0 then
+		return false
+	end
+
+	for _, mon in ipairs(live_outputs) do
 		local name = mon.name or ""
 		if name ~= "" and name ~= "FALLBACK" then
 			return false -- 还有真实输出在用，正常

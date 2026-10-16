@@ -132,7 +132,9 @@ apply() {
 	for i in "${!entries[@]}"; do
 		if [ "${entries[$i]}" = "$choice" ]; then
 			if ! mode_allowed "${names[$i]}"; then
-				# 用 Hyprland 原生 OSD 提示（本机没有 dunst，notify-send 会卡住）
+				# 用 Hyprland 原生 OSD 提示：不依赖通知守护进程是否在跑
+				# （org.freedesktop.Notifications 由 dunst / KDE plasma 提供，
+				# 未必一直可用），样式也与 project-mode.lua 的投影浮层一致
 				hyprctl notify 3 4000 "rgb(d20f39)" \
 					"未检测到外接显示器，已取消切换（复制/扩展/仅投影仪需要外接屏）" >/dev/null 2>&1
 				return 1
