@@ -45,7 +45,54 @@ entries=()
 names=()
 builtin_only=0
 
+# 有没有"外接（非内屏）的真实输出"？内屏按端口名前缀判断（eDP/LVDS/DSI），
+# FALLBACK 是 Hyprland 在所有真实输出关掉时造的虚拟输出，不算数。
+# 注意用 monitors all：被关闭的输出也算"接着"（否则从 pc-only 回不去扩展）。
+EXTERNAL_PRESENT=0
+detect_external() {
+	if hyprctl -j monitors all 2>/dev/null | python3 -c '
+import json, re, sys
+try:
+    monitors = json.load(sys.stdin)
+except Exception:
+    sys.exit(1)
+for m in monitors:
+    name = (m.get("name") or "")
+    if not name or name == "FALLBACK":
+        continue
+    if re.match(r"^(eDP|EDP|LVDS|DSI)", name):
+        continue
+    sys.exit(0)   # 找到外接屏
+sys.exit(1)       # 只有内屏
+'
+	then
+		EXTERNAL_PRESENT=1
+	else
+		EXTERNAL_PRESENT=0
+	fi
+}
+
+# 需要外接屏的模式：没有外接屏时不允许切（避免把唯一的内屏切没 / 切了也没意义）
+mode_allowed() {
+	case "$1" in
+		pc-only | internal) return 0 ;;
+		*) [ "$EXTERNAL_PRESENT" = "1" ] ;;
+	esac
+}
+
+# 没有外接屏时，在外接屏相关条目后面加个提示
+hint_suffix() {
+	# 只有"需要外接屏"的模式才加提示
+	if mode_allowed "$1"; then
+		printf ''
+	else
+		printf ' （未接外接屏）'
+	fi
+}
+
 collect() {
+	detect_external
+
 	local active=""
 	if [ -r "$SETTINGS" ]; then
 		active=$(sed -n 's/.*"active_profile"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$SETTINGS" | head -1)
@@ -57,7 +104,7 @@ collect() {
 		[ -r "$PROFILE_DIR/$name.json" ] || continue
 		marker="○"
 		[ "$name" = "$active" ] && marker="●"
-		entries+=("$marker ${LABELS[$i]}")
+		entries+=("$marker ${LABELS[$i]}$(hint_suffix "$name")")
 		names+=("$name")
 	done
 
@@ -67,7 +114,7 @@ collect() {
 		for i in "${!BUILTIN[@]}"; do
 			marker="○"
 			[ "${BUILTIN[$i]}" = "$active" ] && marker="●"
-			entries+=("$marker ${LABELS[$i]}")
+			entries+=("$marker ${LABELS[$i]}$(hint_suffix "${BUILTIN[$i]}")")
 			names+=("${BUILTIN[$i]}")
 		done
 	fi
@@ -84,6 +131,12 @@ apply() {
 	local choice=$1 i
 	for i in "${!entries[@]}"; do
 		if [ "${entries[$i]}" = "$choice" ]; then
+			if ! mode_allowed "${names[$i]}"; then
+				# 用 Hyprland 原生 OSD 提示（本机没有 dunst，notify-send 会卡住）
+				hyprctl notify 3 4000 "rgb(d20f39)" \
+					"未检测到外接显示器，已取消切换（复制/扩展/仅投影仪需要外接屏）" >/dev/null 2>&1
+				return 1
+			fi
 			if [ "$builtin_only" = 1 ]; then
 				setsid hyprctl eval "dofile(\"$MODE_LUA\").set(\"${names[$i]}\")" >/dev/null 2>&1 &
 			else

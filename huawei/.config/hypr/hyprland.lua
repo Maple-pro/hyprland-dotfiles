@@ -269,7 +269,44 @@ local function monitor_signature()
 	return table.concat(parts, ",")
 end
 
+-- 黑屏兜底。
+-- 真实输出全被关掉时（典型场景：关机前选的是"仅投影仪"，开机时外接屏不在），
+-- Hyprland 会留一个名为 FALLBACK 的虚拟输出（disabled=false），物理屏却仍然是黑的，
+-- 所以判断"还有没有屏幕在用"必须忽略 FALLBACK —— 只按名字看。
+-- moniqued 自身也有兜底，但要等它服务起来（几秒甚至更久），这里立即补一次。
+local function rescue_black_screen()
+	for _, mon in ipairs(hl.get_monitors() or {}) do
+		local name = mon.name or ""
+		if name ~= "" and name ~= "FALLBACK" then
+			return false -- 还有真实输出在用，正常
+		end
+	end
+
+	hl.monitor({
+		output = "eDP-1",
+		mode = "preferred",
+		position = "0x0",
+		scale = 1,
+		disabled = false,
+		mirror = "",
+	})
+	hl.exec_cmd("'" .. waybarRestart .. "'")
+	pcall(function()
+		hl.notification.create({
+			text = "所有显示器都处于关闭状态\n已自动打开笔记本内屏 eDP-1",
+			timeout = 6000,
+			icon = 3,
+		})
+	end)
+	return true
+end
+
 local function on_monitors_changed()
+	if rescue_black_screen() then
+		-- 刚把内屏救回来：这一轮不再做别的（工作区/waybar 由下一次事件处理）
+		return
+	end
+
 	-- 配置加载阶段的 config.reloaded 会在显示器还没枚举出来时先触发一次，
 	-- 这时 hl.get_monitors() 是空的：签名算出空串，跟上次会话存档的签名必然不同，
 	-- 于是白重启一次 waybar；紧接着 hyprland.start 又按自启动拉起第二个
@@ -317,10 +354,17 @@ end
 for _, event in ipairs({
 	"config.reloaded",
 	"monitor.added",
+	"monitor.removed",
 	"monitor.layout_changed",
 }) do
 	hl.on(event, on_monitors_changed)
 end
+
+-- 开机时的兜底：配置解析时输出可能还没枚举完，等 3 秒再确认一次。
+-- 关机前存的是"仅投影仪"、开机时外接屏不在 —— 黑屏就是在这个窗口里发生的。
+hl.timer(function()
+	rescue_black_screen()
+end, { timeout = 3000, type = "oneshot" })
 
 -- -----------------------------------------------------------------------------
 -- Autostart
@@ -333,6 +377,11 @@ hl.on("hyprland.start", function()
 	-- （之前这里写的是 hl.exec_cmd("waybar")，跟布局钩子那次重启撞在一起就是两个 waybar。）
 	hl.exec_cmd("'" .. waybarRestart .. "'")
 	hl.exec_cmd("dunst")
+	-- moniqued：热插拔 / 唤醒时按显示器指纹自动套用 monique 档案。
+	-- 它是 user service（WantedBy=graphical-session.target），但这台机器的
+	-- graphical-session.target 从未被激活 —— 上次是手动 "--now" 起来的，
+	-- 结果重启后根本没跑（它自带的黑屏兜底也就一起失效了）。这里显式拉起。
+	hl.exec_cmd("systemctl --user start moniqued")
 	hl.exec_cmd("hyprpolkitagent")
 	hl.exec_cmd("hypridle")
 	hl.exec_cmd("nm-applet")
