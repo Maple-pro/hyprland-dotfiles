@@ -31,7 +31,11 @@ hl.env("ELECTRON_OZONE_PLATFORM_HINT", "auto")
 hl.env("_JAVA_AWT_WM_NONREPARENTING", "1")
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
-hl.env("GTK_IM_MODULE", "")
+-- 空字符串/不设置时，GTK3/4 在 Wayland 下会退回内置 "wayland"(text-input-v3) 通路，
+-- 由 Hyprland 转发给 fcitx5 的 wayland 前端；实测 xdg-desktop-portal-gtk 的对话框
+-- 在这条通路上拿不到输入法上下文（Ctrl+Space 无反应）。改为显式 fcitx 后，
+-- GTK 应用走 fcitx5-gtk 的 D-Bus 模块，portal 对话框也能正常切输入法。
+hl.env("GTK_IM_MODULE", "fcitx")
 
 -- -----------------------------------------------------------------------------
 -- Monitors / 投影模式（Super+P 循环，等价于 Windows 的 Win+P）
