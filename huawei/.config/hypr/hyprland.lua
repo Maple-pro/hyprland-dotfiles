@@ -400,7 +400,9 @@ hl.on("hyprland.start", function()
 	-- 移动硬盘 / U 盘：托盘指示器 + 自动挂载 + 挂载/卸载菜单
 	hl.exec_cmd("udiskie")
 	hl.exec_cmd("fcitx5 -d --replace")
-	hl.exec_cmd("foot")
+	-- 开机自启的 foot 放进 special workspace（scratchpad），而不是挤在 1 号工作区。
+	-- silent：只把窗口送过去，不切换当前视图；用 SUPER + ` 随时呼出 / 收起。
+	hl.exec_cmd("[workspace special:scratchpad silent] foot")
 	-- hl.exec_cmd("/usr/bin/flclash")
 	hl.exec_cmd("wl-paste --type text --watch cliphist store")
 	hl.exec_cmd("wl-paste --type image --watch cliphist store")
