@@ -22,3 +22,9 @@
 # Legion Monique generated state (authored profile definitions stay tracked).
 /legion/.config/hypr/monitors.lua
 /legion/.config/monique/settings.json
+
+# Compiled build artifact — the source (drm-free.c) next to it IS tracked.
+# Rebuild with:
+#   cc -O2 -o huawei/.config/hypr/scripts/drm-free \
+#      huawei/.config/hypr/scripts/drm-free.c
+/huawei/.config/hypr/scripts/drm-free
