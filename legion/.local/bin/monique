@@ -1,0 +1,7 @@
+#!/usr/bin/python3
+import sys
+sys.path.insert(0, '/home/yangfeng/.local/lib/monique-hypr56')
+from compat import install
+install()
+from monique.app import main
+main()

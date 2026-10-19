@@ -162,6 +162,8 @@ local CMD_RULES = {
 	{ "grim - |", "Screenshot full screen → clipboard", "System" },
 	{ "hyprpicker", "Pick color (HEX to clipboard)", "System" },
 	{ "hyprlock", "Lock screen", "System" },
+	{ "loginctl lock-session", "Lock screen", "System" },
+	{ "--signal=SIGUSR1 waybar.service", "Toggle Waybar", "System" },
 	{ "pkill -SIGUSR1 waybar", "Reload Waybar", "System" },
 	{ "keybinds.lua", "Show this keybind cheatsheet", "System" },
 	{ "rofi -show keybinds", "Show this keybind cheatsheet", "System" },
@@ -234,7 +236,11 @@ local function describe(bind)
 	elseif name == "window.drag" then
 		desc, cat = "Drag window (hold)", "Mouse"
 	elseif name == "window.resize" then
-		desc, cat = "Resize window (hold)", "Mouse"
+		if type(a) == "table" and a.relative then
+			desc, cat = string.format("Resize window by %s × %s", a.x or 0, a.y or 0), "Window"
+		else
+			desc, cat = "Resize window (hold)", "Mouse"
+		end
 	elseif name == "layout" then
 		desc, cat = (tostring(a) == "togglesplit") and "Toggle split direction" or ("Layout: " .. tostring(a)), "Window"
 	elseif name == "exit" then
@@ -248,7 +254,9 @@ local function describe(bind)
 			desc, cat = "Go to workspace " .. tostring(a.workspace), "Workspace"
 		end
 	elseif name == "window.move" then
-		if type(a) == "table" and a.workspace ~= nil then
+		if type(a) == "table" and a.direction then
+			desc, cat = "Move window " .. tostring(a.direction), "Window"
+		elseif type(a) == "table" and a.workspace ~= nil then
 			local ws = tostring(a.workspace)
 			if ws:find("special:") then
 				desc, cat = "Move window to scratchpad", "Workspace"

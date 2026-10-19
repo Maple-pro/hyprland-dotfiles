@@ -45,7 +45,50 @@ entries=()
 names=()
 builtin_only=0
 
+EXTERNAL_PRESENT=0
+detect_external() {
+	if hyprctl -j monitors all 2>/dev/null | python3 -c '
+import json, re, sys
+try:
+    monitors = json.load(sys.stdin)
+except Exception:
+    sys.exit(1)
+for m in monitors:
+    name = (m.get("name") or "")
+    if not name or name == "FALLBACK":
+        continue
+    if re.match(r"^(eDP|EDP|LVDS|DSI)", name):
+        continue
+    sys.exit(0)   # 找到外接屏
+sys.exit(1)       # 只有内屏
+'
+	then
+		EXTERNAL_PRESENT=1
+	else
+		EXTERNAL_PRESENT=0
+	fi
+}
+
+# 需要外接屏的模式：没有外接屏时不允许切（避免把唯一的内屏切没 / 切了也没意义）
+mode_allowed() {
+	case "$1" in
+		pc-only | internal) return 0 ;;
+		*) [ "$EXTERNAL_PRESENT" = "1" ] ;;
+	esac
+}
+
+# 没有外接屏时，在外接屏相关条目后面加个提示
+hint_suffix() {
+	# 只有"需要外接屏"的模式才加提示
+	if mode_allowed "$1"; then
+		printf ''
+	else
+		printf ' (not connected)'
+	fi
+}
+
 collect() {
+    detect_external
     # Create/update the four profiles when a different external display is connected.
     "$HOME_DIR/.config/hypr/scripts/monique-profiles.py" --ensure >&2 || true
 	local active=""
@@ -59,7 +102,7 @@ collect() {
 		[ -r "$PROFILE_DIR/$name.json" ] || continue
 		marker="○"
 		[ "$name" = "$active" ] && marker="●"
-		entries+=("$marker ${LABELS[$i]}")
+		entries+=("$marker ${LABELS[$i]}$(hint_suffix "$name")")
 		names+=("$name")
 	done
 
@@ -69,7 +112,7 @@ collect() {
 		for i in "${!BUILTIN[@]}"; do
 			marker="○"
 			[ "${BUILTIN[$i]}" = "$active" ] && marker="●"
-			entries+=("$marker ${LABELS[$i]}")
+			entries+=("$marker ${LABELS[$i]}$(hint_suffix "${BUILTIN[$i]}")")
 			names+=("${BUILTIN[$i]}")
 		done
 	fi
@@ -86,6 +129,11 @@ apply() {
 	local choice=$1 i
 	for i in "${!entries[@]}"; do
 		if [ "${entries[$i]}" = "$choice" ]; then
+            detect_external
+            if ! mode_allowed "${names[$i]}"; then
+                hyprctl notify 3 4000 "rgb(d20f39)" "Connect an external display first" >/dev/null 2>&1 || true
+                return 1
+            fi
 			if [ "$builtin_only" = 1 ]; then
 				setsid hyprctl eval "dofile(\"$MODE_LUA\").set(\"${names[$i]}\")" >/dev/null 2>&1 &
 			else

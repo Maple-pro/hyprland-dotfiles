@@ -9,10 +9,10 @@
 // "margin-right": 8,
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": [],
-    "modules-right": ["pulseaudio", "custom/mic", "keyboard-state", "backlight", "battery", "memory", "cpu", "tray", "clock"],
+    "modules-right": ["pulseaudio", "custom/mic", "custom/keyboard-state", "backlight", "battery", "memory", "cpu", "tray", "clock"],
 
     "hyprland/workspaces": {
-        "format": "{name} <span size='small' alpha='62%'>{windows}</span>",
+        "format": "{name} <span size='small' alpha='88%'>{windows}</span>",
         "format-window-separator": " ",
         "window-rewrite-default": "{class}",
         "window-rewrite": {
@@ -85,8 +85,8 @@
             "mode-mon-col": 3,
             "weeks-pos": "right"
         },
-        "on-click-right": "mode",
-        "interval": 10
+        "actions": { "on-click-right": "mode" },
+        "interval": 1
     },
 
     "pulseaudio": {
@@ -112,22 +112,18 @@
         "on-click": "pactl set-source-mute @DEFAULT_SOURCE@ toggle"
     },
 
-    "keyboard-state": {
-        "capslock": true,
-        "numlock": false,
-        "format": "{icon}",
-        "format-icons": {
-            "locked": "󰪛",
-            "unlocked": "󰪟"
-        }
+    "custom/keyboard-state": {
+        "exec": "/home/yangfeng/.config/hypr/scripts/capslock-state.py",
+        "return-type": "json",
+        "interval": 1
     },
 
     "backlight": {
         "device": "intel_backlight",
         "format": "{icon} {percent}%",
         "format-icons": ["󰃞", "󰃟", "󰃠"],
-        "on-scroll-up": "brightnessctl set +5%",
-        "on-scroll-down": "brightnessctl set 5%-"
+        "on-scroll-up": "brightnessctl -n2 set +5%",
+        "on-scroll-down": "brightnessctl -n2 set 5%-"
     },
 
     "battery": {

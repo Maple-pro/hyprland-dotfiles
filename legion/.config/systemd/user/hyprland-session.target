@@ -1,0 +1,7 @@
+[Unit]
+Description=Services for the current Hyprland session
+BindsTo=graphical-session.target
+After=graphical-session.target
+Wants=hyprland-session-guard.service dunst.service hyprpolkitagent.service
+Wants=hypridle.service waybar.service moniqued.service
+Wants=hyprland-battery.timer hyprland-xsettingsd.service

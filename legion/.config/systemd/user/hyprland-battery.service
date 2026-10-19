@@ -1,0 +1,8 @@
+[Unit]
+Description=Low battery notifications
+PartOf=hyprland-session.target
+After=dunst.service
+
+[Service]
+Type=oneshot
+ExecStart=/home/yangfeng/.config/hypr/scripts/battery-notify.py

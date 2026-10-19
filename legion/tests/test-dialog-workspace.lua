@@ -1,0 +1,18 @@
+local profile=assert(arg[1])
+local env=setmetatable({dofile=function(path) return dofile((path:gsub('^/home/yangfeng/',profile .. '/'))) end},{__index=_G})
+local m=assert(loadfile(profile .. '/.config/hypr/scripts/dialog-workspace.lua','t',env))()
+local selector=dofile(profile .. '/.config/hypr/scripts/workspace-selector.lua')
+local function w(id,class) return {class=class or 'pdf',mapped=true,workspace={id=id,name=tostring(id)}} end
+local new,a,b=w(5),w(8),w(9)
+local function api(active,last) return {get_active_window=function()return active end,get_last_window=function()return last end} end
+assert(m.target(new,api(a,b),{new,a,b})==a.workspace)
+assert(m.target(new,api(new,b),{new,a,b})==b.workspace)
+assert(m.target(new,api(nil,b),{new,a,b})==b.workspace)
+assert(m.target(new,api(nil,nil),{new,a})==a.workspace)
+assert(m.target(new,api(nil,nil),{new,a,b})==nil)
+assert(m.target(new,api(w(2,'other'),nil),{new})==nil)
+assert(selector({id=-98,name='special:scratchpad'})=='special:scratchpad')
+assert(selector({id=-1337,name='notes'})=='name:notes')
+assert(selector({id=5,name='5'})=='5')
+assert(selector({id=-98})==nil)
+print('PASS focused/previous/unique/ambiguous window targets and special/named selectors')

@@ -157,6 +157,7 @@ PACKAGES=(
 	lua
 	python
 	util-linux
+	xsettingsd
 
 	# applications the default keybindings launch
 	fsearch
@@ -187,6 +188,25 @@ ENTRIES=(
 	.config/monique/profiles
 	.config/foot
 	.config/dunst
+    .config/xsettingsd
+    .config/fcitx5/conf/notifications.conf
+    .config/systemd/user/hyprland-session.target
+    .config/systemd/user/hyprland-session-guard.service
+    .config/systemd/user/hyprland-battery.service
+    .config/systemd/user/hyprland-battery.timer
+    .config/systemd/user/hyprland-xsettingsd.service
+    .config/systemd/user/dunst.service.d/hyprland.conf
+    .config/systemd/user/waybar.service.d/hyprland.conf
+    .config/systemd/user/moniqued.service.d/hypr56.conf
+    .config/systemd/user/hypridle.service.d/hyprland.conf
+    .config/systemd/user/hyprpolkitagent.service.d/hyprland.conf
+    .local/bin/monique
+    .local/bin/moniqued
+    .local/share/applications/wps-office-et.desktop
+    .local/bin/et
+    .local/lib/monique-hypr56
+    .local/share/applications/com.github.monique.desktop
+    .local/share/dbus-1/services/org.freedesktop.Notifications.service
 )
 
 # -----------------------------------------------------------------------------
@@ -248,6 +268,10 @@ done
 # Summary
 # -----------------------------------------------------------------------------
 echo
+# Seed deployment policy without replacing active/pinned runtime state.
+if [[ ! -f "$TARGET_HOME/.config/monique/settings.json" ]]; then
+    printf '%s\n' '{"hypr_config_format":"lua","use_port_names":true,"update_sddm":false,"update_greetd":false,"migrate_workspaces":false}' > "$TARGET_HOME/.config/monique/settings.json"
+fi
 say "$installed configuration entries installed"
 if ((skipped == 1)); then
 	warn "1 entry listed in this script was missing from the profile."
@@ -277,7 +301,8 @@ fi
 cat <<EOF
 
 ${BOLD}Next steps${RESET}
-  * Log out and pick the Hyprland session in SDDM, or run: start-hyprland
+  * Run systemctl --user daemon-reload, then log out and pick Hyprland.
+    session-start.sh imports the environment and starts hyprland-session.target.
 
   * Waybar is started through hypr/scripts/start-waybar.sh, which points
     XDG_CONFIG_HOME at waybar/gtk-only and uses the keyfile GSettings backend.

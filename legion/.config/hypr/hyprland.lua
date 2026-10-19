@@ -42,7 +42,8 @@ hl.env("XFT_DPI", "120")
 hl.env("XMODIFIERS", "@im=fcitx")
 hl.env("QT_IM_MODULE", "fcitx")
 hl.env("SDL_IM_MODULE", "fcitx")
-hl.env("GLFW_IM_MODULE", "fcitx")
+hl.env("GLFW_IM_MODULE", "ibus")
+hl.env("GTK_IM_MODULE", "fcitx")
 hl.env("ELECTRON_TRAY_IMPL", "statusnotifier")
 
 -- -----------------------------------------------------------------------------
@@ -56,57 +57,12 @@ hl.env("ELECTRON_TRAY_IMPL", "statusnotifier")
 --   2) 内置兜底：scripts/project-mode.lua（monique 没装或还没建档案时按端口名配）
 local monitorsLua = "/home/yangfeng/.config/hypr/monitors.lua"
 
--- 读出 monique 的配置，解析其中的 workspace_rule，再用注入了 hl 的环境执行
--- （本文件里的 hl 在 keybinds.lua 速查表的沙箱中是桩对象，而 dofile 用默认全局
--- 环境，直接 dofile 会让沙箱里取不到 hl）。
+-- Read saved rules through the startup guard before submitting monitor changes.
 local workspaceRules = {}
--- 本轮配置里"正在镜像别人的输出"（例如 mirror 档案里的 HDMI-A-1），
--- 用于检测"离开镜像模式"，见下面的 heal_outputs_that_left_mirror
-local mirroredOutputs = {}
-
 local function load_monique_config()
-	local f = io.open(monitorsLua, "r")
-	if not f then
-		return false
-	end
-	local src = f:read("*a") or ""
-	f:close()
-
-	-- 每次加载都重新解析：这两张表是"本轮配置"的快照，
-	-- 不清空的话会跨 reload 累加，切换档案后残留上一份的规则。
-	workspaceRules = {}
-	mirroredOutputs = {}
-
-	for block in src:gmatch("workspace_rule%s*%((.-)%)") do
-		local ws = block:match('workspace%s*=%s*"([^"]+)"')
-		local mon = block:match('monitor%s*=%s*"([^"]+)"')
-		if ws and mon then
-			workspaceRules[#workspaceRules + 1] = { workspace = ws, monitor = mon }
-		end
-	end
-
-	for block in src:gmatch("hl%.monitor%s*%((.-)%)") do
-		local output = block:match('output%s*=%s*"([^"]*)"')
-		local mirror = block:match('mirror%s*=%s*"([^"]*)"')
-		if output and output ~= "" and mirror and mirror ~= "" then
-			mirroredOutputs[output] = true
-		end
-	end
-
-	-- Monique omits false/empty fields; explicitly reset them when an output
-	-- leaves a disabled or mirrored layout.
-	local monitorApi = setmetatable({ monitor = function(rule)
-		if rule.disabled ~= true then
-			rule.disabled = false
-			rule.mirror = rule.mirror or ""
-		end
-		return hl.monitor(rule)
-	end }, { __index = hl })
-	local chunk = load(src, "@" .. monitorsLua, "t", setmetatable({ hl = monitorApi }, { __index = _G }))
-	if not chunk then
-		return false
-	end
-	return pcall(chunk)
+	local ok, rules = dofile("/home/yangfeng/.config/hypr/scripts/projection-startup.lua").load(hl, monitorsLua)
+	workspaceRules = rules
+	return ok
 end
 
 local okProjectMode, ProjectMode = pcall(dofile, projectMode)
@@ -137,184 +93,9 @@ else
 	})
 end
 
--- Fallback for any other output：默认「复制」。
--- 没被任何档案/规则单独指到的输出（比如插了另一块屏、档案里的端口名对不上）
--- 一律镜像 eDP-1，避免"以为在复制、结果桌面被扩展出去"。
--- 具体规则（monique 档案里按 eDP-1 / HDMI-A-1 写的那些）排在前面，优先级更高。
-hl.monitor({
-	output = "",
-	mode = "preferred",
-	position = "auto",
-	scale = 1,
-	mirror = "eDP-1",
-})
-
--- -----------------------------------------------------------------------------
--- 工作区归属：扩展模式时主屏（eDP-1）只保留 workspace 1
--- -----------------------------------------------------------------------------
--- monique 档案里声明的 workspace_rule 只保证"新建"的工作区落在指定屏幕上
--- （实测：切换档案后新建的 ws9/ws10 自动落到外接屏，已存在的 ws5/ws6 不会自己搬），
--- 所以这里在启动 / 配置重载 / 显示器变化时按档案声明的归属校正一次：
--- 声明归谁，就真的待在谁的屏上。mirror / pc-only / external 档案没有工作区规则，
--- 这段就完全不动（否则工作区会被困在已关闭的屏幕上）。
-local function enforce_workspace_ownership()
-	if #workspaceRules == 0 then
-		return
-	end
-
-	-- 规则里的显示器写的是 desc:描述，翻译成当前实际存在的输出名
-	local name_of = {}
-	for _, mon in ipairs(hl.get_monitors() or {}) do
-		if mon.name then
-			name_of[mon.name] = mon.name
-			if mon.description then
-				name_of["desc:" .. mon.description] = mon.name
-			end
-		end
-	end
-
-	local current = {}
-	for _, ws in ipairs(hl.get_workspaces() or {}) do
-		current[ws.id] = ws
-	end
-
-	for _, rule in ipairs(workspaceRules) do
-		local target = name_of[rule.monitor]
-		local id = tonumber(rule.workspace)
-		if target and id then
-			local ws = current[id]
-			local where = ws and ws.monitor and ws.monitor.name
-			if where and where ~= target then
-				hl.dispatch(hl.dsp.workspace.move({ workspace = rule.workspace, monitor = target }))
-			end
-		end
-	end
-end
-
--- 镜像输出上的工作区要救回来：复制模式下那块屏画的是源屏的内容，
--- 而扩展模式留在它下面的工作区（ws2-10）就变成"调不出来"——既不在主屏，
--- 也不在镜像屏上显示。把这些工作区搬回非镜像的源屏。
-local function rescue_workspaces_from_mirrors()
-	local fallback = nil
-	for _, mon in ipairs(hl.get_monitors() or {}) do
-		if not mon.is_mirror then
-			fallback = fallback or mon
-		end
-	end
-	if not fallback then
-		return
-	end
-
-	for _, ws in ipairs(hl.get_workspaces() or {}) do
-		local where = ws.monitor
-		if where and where.is_mirror then
-			hl.dispatch(hl.dsp.workspace.move({ workspace = tostring(ws.id), monitor = fallback.name }))
-		end
-	end
-end
-
--- 显示器变化后的处理（工作区归属校正、镜像救援、waybar 补建、镜像后遗症自愈）。
---
--- 跨 reload 的状态只能落盘：hyprctl reload 会把 Lua 状态整个重置（连 _G 里的全局
--- 都会没），所以监听器里读不到上一轮的 local / global。这里把"上次哪些输出在镜像"
--- 和"上次的布局签名"记在一个小文件里。
-local stateFile = (os.getenv("HOME") or "/tmp") .. "/.cache/hypr/monitor-state"
-
-local function read_state()
-	local mirrors, signature = {}, nil
-	local f = io.open(stateFile, "r")
-	if not f then
-		return mirrors, signature
-	end
-	for line in f:lines() do
-		local key, value = line:match("^(%S+)%s+(.+)$")
-		if key == "mirror" then
-			mirrors[value] = true
-		elseif key == "signature" then
-			signature = value
-		end
-	end
-	f:close()
-	return mirrors, signature
-end
-
-local function write_state(signature)
-	local dir = stateFile:match("^(.*)/[^/]+$")
-	if dir then
-		pcall(os.execute, "mkdir -p '" .. dir .. "'")
-	end
-	local f = io.open(stateFile, "w")
-	if not f then
-		return
-	end
-	for name in pairs(mirroredOutputs) do
-		f:write("mirror ", name, "\n")
-	end
-	if signature then
-		f:write("signature ", signature, "\n")
-	end
-	f:close()
-end
-
--- 布局指纹：谁在哪、是不是镜像。用于判断"布局真的变了"，避免每次 reload 都重启 waybar
-local function monitor_signature()
-	local parts = {}
-	for _, mon in ipairs(hl.get_monitors() or {}) do
-		parts[#parts + 1] = string.format(
-			"%s:%d:%d:%s",
-			mon.name or "?",
-			mon.x or 0,
-			mon.y or 0,
-			mon.is_mirror and "mirror" or "own"
-		)
-	end
-	table.sort(parts)
-	return table.concat(parts, ",")
-end
-
-local function on_monitors_changed()
-	local previousMirrors, previousSignature = read_state()
-	local signature = monitor_signature()
-
-	-- 离开镜像模式：这块输出当过镜像，Hyprland 有时不会重建它的 wl_output
-	-- （客户端完全看不到它，waybar 就永远不在上面画 bar，重启 waybar 也没用）。
-	-- 唯一可靠的办法是让它走一遍"禁用 → 启用"。
-	local to_heal = {}
-	for name in pairs(previousMirrors) do
-		if not mirroredOutputs[name] then
-			to_heal[#to_heal + 1] = name
-		end
-	end
-	write_state(signature)
-
-	if #to_heal > 0 then
-		for _, name in ipairs(to_heal) do
-			hl.monitor({ output = name, disabled = true })
-		end
-		hl.timer(function()
-			-- reload 按档案把它重新打开，随后重启 waybar 让它在新输出上建 bar
-			hl.exec_cmd("hyprctl reload; sleep 1; '" .. waybarRestart .. "'")
-		end, { timeout = 700, type = "oneshot" })
-		return
-	end
-
-	enforce_workspace_ownership()
-	rescue_workspaces_from_mirrors()
-
-	if previousSignature and signature ~= previousSignature then
-		hl.exec_cmd("'" .. waybarRestart .. "'")
-	end
-end
-
--- 这些事件都会在显示器布局变化时触发。监听器不需要手工清理：
--- 每次 reload 都是全新的 Lua 状态，旧的监听器会随之消失。
-for _, event in ipairs({
-	"config.reloaded",
-	"monitor.added",
-	"monitor.layout_changed",
-}) do
-	hl.on(event, on_monitors_changed)
-end
+-- Unknown outputs stay usable even when the internal display is disabled.
+hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1, mirror = "" })
+dofile("/home/yangfeng/.config/hypr/scripts/projection-state.lua").setup(hl, workspaceRules, waybarRestart)
 
 hl.config({
 	xwayland = {
@@ -327,19 +108,15 @@ hl.config({
 -- Autostart
 -- -----------------------------------------------------------------------------
 hl.on("hyprland.start", function()
-	hl.exec_cmd("dbus-update-activation-environment --systemd --all")
+	hl.exec_cmd("/home/yangfeng/.config/hypr/scripts/session-start.sh")
 	hl.exec_cmd("/usr/lib/pam_kwallet_init")
 	hl.exec_cmd("xrdb -merge /home/yangfeng/.Xresources")
 	hl.exec_cmd("hyprpaper")
 	hl.exec_cmd("/home/yangfeng/.config/hypr/scripts/apply-rounding.sh apply " .. (rounded and "rounded" or "square"))
-	hl.exec_cmd("/home/yangfeng/.config/hypr/scripts/start-waybar.sh")
-	hl.exec_cmd("dunst")
-	hl.exec_cmd("hyprpolkitagent")
-	hl.exec_cmd("hypridle")
 	hl.exec_cmd("nm-applet")
 	hl.exec_cmd("blueman-applet")
 	hl.exec_cmd("fcitx5 -d --replace")
-	hl.exec_cmd("foot")
+	hl.exec_cmd("[workspace special:scratchpad silent] foot")
 	hl.exec_cmd("sleep 3 && mihomo-party --enable-features-StatusNotifierItem -ozone-platform-hint=auto")
 	hl.exec_cmd("wl-paste --type text --watch cliphist store")
 	hl.exec_cmd("wl-paste --type image --watch cliphist store")
@@ -522,77 +299,14 @@ local fixedWorkspaceApps = {
 	{ name = "ws-pdf", workspace = 5, classes = { "pdf", "wpspdf" } },
 }
 
--- class -> 默认工作区，监听器用它判断"这个窗口属不属于设了默认工作区的应用"
-local defaultWorkspaceOfClass = {}
-
--- Hyprland 用 ECMAScript 正则匹配 class，这里把元字符转义后再拼成 ^(a|b)$
-local function class_regex(classes)
-	local parts = {}
-	for _, class in ipairs(classes) do
-		parts[#parts + 1] = (class:gsub("([%^%$%(%)%.%[%]%*%+%-%?%{%}%|%/])", "\\%1"))
-	end
-	if #parts == 1 then
-		return "^" .. parts[1] .. "$"
-	end
-	return "^(" .. table.concat(parts, "|") .. ")$"
-end
-
 for _, app in ipairs(fixedWorkspaceApps) do
-	hl.window_rule({
-		name = app.name,
-		match = { class = class_regex(app.classes) },
-		workspace = app.workspace .. " silent",
-	})
-
-	for _, class in ipairs(app.classes) do
-		defaultWorkspaceOfClass[class] = app.workspace
-	end
+    local parts = {}
+    for _, class in ipairs(app.classes) do
+        parts[#parts + 1] = (class:gsub("([^%w])", "\\%1"))
+    end
+    hl.window_rule({name = app.name, match = {class = "^(" .. table.concat(parts, "|") .. ")$"}, workspace = app.workspace .. " silent"})
 end
-
--- 弹窗跟随应用。
--- 规则按 class 把窗口放到默认工作区，但保存文件 / 打开 / 选字体 / 转发信息这类弹窗
--- 和主窗口共用同一个 class，于是即使用户已经把应用挪到别的工作区，弹窗还是会被规则
--- 送回默认工作区。
--- 这里的规则很简单：
---   * 已经有同类窗口"打开着" -> 新窗口去它所在的工作区（有多个时优先当前活动工作区，
---     弹窗的父窗口通常就在那儿）；
---   * 一个同类窗口都没有（应用刚启动的第一扇窗）-> 不动它，交给上面的规则放默认工作区。
--- window.open 在 Hyprland 里是 mapWindow 的最后一步（工作区规则和布局都已处理完），
--- 此时再挪一次是安全的。
-local function workspace_of_open_window(w)
-	local active = hl.get_active_workspace()
-	local fallback = nil
-
-	for _, other in ipairs(hl.get_windows() or {}) do
-		if other ~= w and other.class == w.class and other.workspace then
-			if active and other.workspace.id == active.id then
-				return other.workspace
-			end
-			fallback = fallback or other.workspace
-		end
-	end
-
-	return fallback
-end
-
-hl.on("window.open", function(w)
-	if not w or defaultWorkspaceOfClass[w.class] == nil then
-		return
-	end
-
-	local target = workspace_of_open_window(w)
-	local current = w.workspace
-	if not target or not current or target.id == current.id then
-		return
-	end
-
-	-- follow = false：只搬窗口，不切视图（跟规则里的 "silent" 一致）
-	hl.dispatch(hl.dsp.window.move({
-		window = w,
-		workspace = tostring(target.id),
-		follow = false,
-	}))
-end)
+dofile("/home/yangfeng/.config/hypr/scripts/dialog-workspace.lua").setup(hl, fixedWorkspaceApps)
 
 -- FSearch: floating search palette instead of a tiled window.
 hl.window_rule({
@@ -719,16 +433,16 @@ hl.bind(mainMod .. " + up", hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down", hl.dsp.focus({ direction = "down" }))
 
 -- Move active window
-hl.bind(mainMod .. " + SHIFT + left", hl.dsp.exec_cmd("hyprctl dispatch movewindow l"))
-hl.bind(mainMod .. " + SHIFT + right", hl.dsp.exec_cmd("hyprctl dispatch movewindow r"))
-hl.bind(mainMod .. " + SHIFT + up", hl.dsp.exec_cmd("hyprctl dispatch movewindow u"))
-hl.bind(mainMod .. " + SHIFT + down", hl.dsp.exec_cmd("hyprctl dispatch movewindow d"))
+hl.bind(mainMod .. " + SHIFT + left", hl.dsp.window.move({ direction = "left" }))
+hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right" }))
+hl.bind(mainMod .. " + SHIFT + up", hl.dsp.window.move({ direction = "up" }))
+hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.move({ direction = "down" }))
 
 -- Resize active window
-hl.bind(mainMod .. " + CTRL + left", hl.dsp.exec_cmd("hyprctl dispatch resizeactive -40 0"))
-hl.bind(mainMod .. " + CTRL + right", hl.dsp.exec_cmd("hyprctl dispatch resizeactive 40 0"))
-hl.bind(mainMod .. " + CTRL + up", hl.dsp.exec_cmd("hyprctl dispatch resizeactive 0 -40"))
-hl.bind(mainMod .. " + CTRL + down", hl.dsp.exec_cmd("hyprctl dispatch resizeactive 0 40"))
+hl.bind(mainMod .. " + CTRL + left", hl.dsp.window.resize({ x = -40, y = 0, relative = true }))
+hl.bind(mainMod .. " + CTRL + right", hl.dsp.window.resize({ x = 40, y = 0, relative = true }))
+hl.bind(mainMod .. " + CTRL + up", hl.dsp.window.resize({ x = 0, y = -40, relative = true }))
+hl.bind(mainMod .. " + CTRL + down", hl.dsp.window.resize({ x = 0, y = 40, relative = true }))
 
 -- Workspaces
 for i = 1, 10 do
@@ -737,9 +451,9 @@ for i = 1, 10 do
 	hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i, follow = false }))
 end
 
-hl.bind(mainMod .. " + BRACKETLEFT", hl.dsp.exec_cmd("hyprctl dispatch workspace m-1"))
-hl.bind(mainMod .. " + BRACKETRIGHT", hl.dsp.exec_cmd("hyprctl dispatch workspace m+1"))
-hl.bind(mainMod .. " + BACKSPACE", hl.dsp.exec_cmd("hyprctl dispatch workspace previous"))
+hl.bind(mainMod .. " + BRACKETLEFT", hl.dsp.focus({ workspace = "m-1" }))
+hl.bind(mainMod .. " + BRACKETRIGHT", hl.dsp.focus({ workspace = "m+1" }))
+hl.bind(mainMod .. " + BACKSPACE", hl.dsp.focus({ workspace = "previous" }))
 
 -- Scratchpad
 hl.bind(mainMod .. " + GRAVE", hl.dsp.workspace.toggle_special("scratchpad"))

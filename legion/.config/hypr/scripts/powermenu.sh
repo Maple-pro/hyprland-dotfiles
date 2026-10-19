@@ -13,13 +13,13 @@ choice="$(
 
 case "$choice" in
   Lock)
-    hyprlock
+    loginctl lock-session
     ;;
   Suspend)
     systemctl suspend
     ;;
   'Log out')
-    hyprctl dispatch exit
+    hyprctl eval 'hl.dispatch(hl.dsp.exit())'
     ;;
   Reboot)
     systemctl reboot

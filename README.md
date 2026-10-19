@@ -117,46 +117,64 @@ The manual copies merge into existing directories rather than replacing them, so
 files that a profile has since dropped are left behind. The installers behave
 the same way; only the backup protects you there.
 
-## Legion shortcuts and projection modes
+## Legion shortcuts, session services and projection
 
-- **Super+/** opens the Rofi cheatsheet, reading the current Lua configuration
-  (including loop-generated bindings). It replaces the old HotKeyHub command.
-- **Super+A** opens FSearch as a floating search window.
-- **Super+P** opens the four-mode projection menu; pseudo-tiling moves to
-  **Super+Shift+P**. Ctrl+Tab inside Rofi also reaches the projection menu.
-- New app windows default to WeChat workspace 1, Krusader 2, Chrome 3,
-  WPS spreadsheets 4, WPS Writer/PDF 5. Later windows of the same class follow
-  an existing window, preferring the active workspace; this includes dialogs
-  and additional main windows. Existing windows are not relocated on reload.
+- **Super+/** opens the Lua-aware Rofi cheatsheet; **Super+A** opens FSearch.
+- **Super+P** opens the English projection menu; **Super+Shift+P** toggles
+  pseudo-tiling. Rofi's Ctrl+Tab also reaches Projection.
+- Default workspaces: WeChat 1, Krusader 2, Chrome 3, WPS spreadsheets 4,
+  Writer/PDF 5. New same-class windows follow the focused or previously focused
+  window, then a unique shared workspace. Ambiguous parents retain the default.
+  Special/named workspaces use explicit selectors.
+- Movement, relative resizing, workspace navigation and logout use Lua dispatch.
+- The autostarted Foot opens silently on the scratchpad; **Super+`** toggles it.
 
-The Legion panel stays at **2560×1600@60, scale 1.25**. Projection profiles
-use the external display's preferred mode at scale 1. In extend mode the
-external display is to the left, with workspaces 2–10; workspace 1 stays on
-the panel. The initial profile is `pc-only`.
+The panel stays **2560×1600@60, scale 1.25**; external displays use preferred
+mode at scale 1. Extend places the external display left, workspaces 2–10 there
+and workspace 1 on the panel. The menu rebuilds generated profiles for new
+hardware and refuses external modes without a connected external display.
+Saved external-only layouts are guarded when only the panel is connected.
+Output reconciliation waits for stable snapshots and completed Monique writes;
+unrelated reloads preserve manual workspace moves. Persistent FALLBACK-only
+sessions get bounded recovery without resetting a working external layout.
 
-Install Monique from the AUR (`yay -S monique`) or from its official source.
-On this machine Monique is installed through `yay` and managed by pacman;
-helpers use the system `python3` and `monique` commands.
+Monique is installed with `yay -S monique` and remains managed by pacman.
+User wrappers in `.local/bin/` load the version/API-guarded compatibility layer
+in `.local/lib/monique-hypr56/`, leaving the package untouched. The menu, GUI
+entry and systemd daemon use those wrappers. They serialize profile changes,
+write atomically, recover configuration on failure and validate mirror sources.
+Failures are recorded in `~/.local/state/hyprland/projection.log`; daemon and
+service output is available through `journalctl --user`. Monique upgrades need
+compatibility review; currently supported: **Monique 0.8.3 / Hyprland 0.56.2**.
 
-`hypr/scripts/monique-profiles.py --ensure` builds the four profiles when the
-menu opens or a mode is selected, using actual monitor identities. A new
-external display causes the generated profiles to be rebuilt; edits are kept
-when the hardware identity is unchanged. Run without `--ensure` to explicitly
-rebuild. With no external display connected, the definitions contain an
-HDMI placeholder using its preferred mode; the switch wrapper refuses all
-modes except `pc-only` until a real external display is detected. The fallback
-Lua module starts in internal-only mode on a fresh installation.
+`session-start.sh` imports the compositor environment before starting
+`hyprland-session.target`, which owns Waybar, Dunst, Monique, hypridle, the
+Polkit agent, XSettings and battery monitoring. Waybar retains Legion's isolated
+GTK settings and one process. The session guard stops graphical services when
+Hyprland exits. The D-Bus notification entry activates Dunst in Hyprland and
+preserves Plasma's notification provider in KDE. Dunst keeps the dark theme and
+uses the current height/offset syntax and recursive icon lookup.
 
-Switching sets Monique to Lua output and disables login-screen updates, so it
-needs no administrator authentication. Monique GUI also uses these saved
-preferences. The hotplug daemon is not required for the menu and is not
-automatically enabled. Waybar recovery calls Legion's `start-waybar.sh` to
-preserve its GTK isolation, and releases the restart lock before launching it.
+The input-method settings remain user-session declarations, including
+`GTK_IM_MODULE=fcitx` for portal dialogs and `GLFW_IM_MODULE=ibus`; no system
+`/etc/environment` or login-manager files are overwritten. Fcitx's redundant
+Wayland diagnostic notifications are hidden. Newly started applications inherit
+the new environment. WPS Spreadsheet's user desktop entry invokes the local XCB
+wrapper with RandR disabled and Legion's 1.25 scale.
 
-`hypr/monitors.lua` and `monique/settings.json` are generated state and ignored;
-only profile definitions are tracked. Monique changes `last_applied_time` in
-those profiles; timestamp-only differences do not need syncing. Back up local
-profiles before deploying the repository copies again.
+Idle locking is **10 minutes**. Before suspend, hypridle requests the session
+lock and waits for the Wayland lock notification; wake-up turns displays on.
+Battery alerts trigger once per discharge level at **20/10/5 percent**. Caps Lock
+reads sysfs LEDs, the calendar's right click uses the supported action mapping,
+and brightness controls preserve a minimum level.
+
+Run `bash legion/tests/run.sh` for source and behavior checks. After deploying,
+run `systemctl --user daemon-reload`; the next Hyprland login starts the target.
+Do not separately enable all graphical services globally. The installer seeds
+missing Monique preferences without copying active/pinned state. Generated
+`hypr/monitors.lua`, Monique settings and Python caches stay untracked; profile
+timestamps alone do not need syncing. Physical hotplug, actual suspend/resume
+and a fresh login require validation on the machine.
 
 ## Huawei projection modes (Super+P)
 
