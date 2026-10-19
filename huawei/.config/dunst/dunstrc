@@ -2,10 +2,12 @@
     monitor = 0
     follow = mouse
     width = 360
-    height = 190
+    height = (0, 190)
     origin = top-right
-    offset = 14x14
+    offset = (14, 14)
     scale = 0
+    enable_recursive_icon_lookup = true
+    icon_theme = Papirus-Light, breeze, hicolor
 
     font = Hack Nerd Font 12
     line_height = 4

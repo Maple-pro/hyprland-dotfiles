@@ -8,7 +8,7 @@
     // "margin-right": 8,
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": [],
-    "modules-right": ["pulseaudio", "keyboard-state", "backlight", "battery", "memory", "cpu", "tray", "clock"],
+    "modules-right": ["pulseaudio", "custom/keyboard-state", "backlight", "battery", "memory", "cpu", "tray", "clock"],
 
     // workspace number + dimmed short app tags of the windows it holds
     "hyprland/workspaces": {
@@ -105,8 +105,8 @@
             "mode-mon-col": 3,
             "weeks-pos": "right"
         },
-        "on-click-right": "mode",
-        "interval": 10
+        "actions": { "on-click-right": "mode" },
+        "interval": 1
     },
 
     "pulseaudio": {
@@ -121,22 +121,18 @@
         "on-click-right": "pamixer -t"
     },
 
-    "keyboard-state": {
-        "capslock": true,
-        "numlock": false,
-        "format": "{icon}",
-        "format-icons": {
-            "locked": "󰪛",
-            "unlocked": "󰪟"
-        }
+    "custom/keyboard-state": {
+        "exec": "/home/yangfeng/.config/hypr/scripts/capslock-state.py",
+        "return-type": "json",
+        "interval": 1
     },
 
     "backlight": {
         "device": "intel_backlight",
         "format": "{icon} {percent}%",
         "format-icons": ["󰃞", "󰃟", "󰃠"],
-        "on-scroll-up": "brightnessctl set +5%",
-        "on-scroll-down": "brightnessctl set 5%-"
+        "on-scroll-up": "brightnessctl -n2 set +5%",
+        "on-scroll-down": "brightnessctl -n2 set 5%-"
     },
 
     "battery": {

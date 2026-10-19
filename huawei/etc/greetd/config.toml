@@ -1,0 +1,6 @@
+[terminal]
+vt = 1
+
+[default_session]
+user = "greeter"
+command = "/usr/bin/tuigreet --no-config --time --remember --user yangfeng --asterisks --greeting 'Arch Linux / Hyprland' --sessions /etc/greetd/wayland-sessions --xsessions /etc/greetd/xsessions --cmd /usr/local/bin/greetd-hyprland-session --env XDG_SESSION_TYPE=wayland --env XDG_CURRENT_DESKTOP=Hyprland --env XDG_SESSION_DESKTOP=Hyprland"

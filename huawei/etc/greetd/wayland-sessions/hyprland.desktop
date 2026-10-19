@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Hyprland
+Comment=Hyprland Wayland session
+Exec=/usr/local/bin/greetd-hyprland-session
+Type=Application
+DesktopNames=Hyprland

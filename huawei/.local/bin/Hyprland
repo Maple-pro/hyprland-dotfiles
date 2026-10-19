@@ -1,0 +1,3 @@
+#!/bin/sh
+# Forward queries and launches without artificial delays.
+exec /usr/bin/Hyprland "$@"

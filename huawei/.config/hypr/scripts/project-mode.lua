@@ -67,7 +67,7 @@ M.profile_names = {
 	external = "external",
 }
 M.monique_dir = (os.getenv("HOME") or "") .. "/.config/monique"
--- 切换档案用的包装脚本：先设 pin 再切（见脚本里的注释）
+-- 切换档案用的包装脚本：串行提交档案与状态（见脚本里的注释）
 M.switch_cmd = (os.getenv("HOME") or "") .. "/.config/hypr/scripts/monique-switch.sh"
 
 local function readable(path)
@@ -153,6 +153,10 @@ function M.state_path()
 end
 
 function M.read()
+	local profile = M.active_profile()
+	for mode, name in pairs(M.profile_names) do
+		if profile == name then return mode end
+	end
 	local f = io.open(M.state_path(), "r")
 	if not f then
 		return M.default
@@ -228,6 +232,19 @@ end
 
 -- 切到指定模式（带通知）
 function M.set(mode)
+	local name = M.profile_names[mode]
+	if name and readable(M.monique_dir .. "/profiles/" .. name .. ".json") then
+		hl_api().exec_cmd("'" .. M.switch_cmd .. "' '" .. name .. "'")
+		return mode
+	end
+	-- With no physical external output in the active layout, keep the internal display.
+	if mode == "external" then
+		local present = false
+		for _, mon in ipairs(hl_api().get_monitors() or {}) do
+			if mon.name == M.external then present = true end
+		end
+		if not present then mode = "internal" end
+	end
 	local applied = M.apply(mode)
 	M.notify(applied)
 	return applied
@@ -251,13 +268,10 @@ function M.cycle()
 		-- 如果在这里同步等它返回，Hyprland 主线程正卡在本段 Lua 里，没人处理那个
 		-- reload 请求，双方互等 = 卡死。
 		--
-		-- 走 monique-switch.sh 而不是直接 monique --switch-profile：它会先把 pin
-		-- 写成目标档案，避免 moniqued 在切换过程中按过期 pin 重放旧档案
-		-- （那会把工作区在两块屏之间反复搬，看起来就像工作区丢了）。
+		-- 由同一个事务锁串行完成应用与状态提交。
 		local api = hl_api()
 		if api.exec_cmd then
 			api.exec_cmd("'" .. M.switch_cmd .. "' '" .. nextp.name .. "'")
-			M.save(nextp.mode)
 			M.notify(nextp.mode)
 			return nextp.mode
 		end

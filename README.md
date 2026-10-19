@@ -24,6 +24,11 @@ huawei/.config/gtk-3.0/              GTK3 Breeze-Light colours, decorations, win
 huawei/.config/gtk-4.0/              GTK4 settings (gtk.css symlinked into the system Breeze theme)
 huawei/.config/xsettingsd/           xsettingsd GTK/XSETTINGS daemon settings
 huawei/.config/nwg-look/             nwg-look export preferences (produced the GTK files above)
+huawei/.config/systemd/user/        Hyprland session services and drop-ins
+huawei/.local/bin/                  Monique, Hyprland and WPS Spreadsheet wrappers
+huawei/.local/lib/monique-hypr56/    Version-guarded Monique compatibility
+huawei/etc/, huawei/usr/            System configuration snapshots (manual deployment)
+huawei/tests/                      Repository-local behavior and syntax checks
 huawei/.config/kdeglobals            KDE/Qt colour scheme and icon theme (Breeze Light)
 huawei/.config/gtkrc, gtkrc-2.0      KDE-generated GTK2 settings
 legion/.config/hypr/                 Hyprland, Hyprpaper, Hypridle, Hyprlock, scripts, wallpaper
@@ -54,8 +59,9 @@ bash legion/install-hyprland.sh     # on the Legion machine
 The installer:
 
 1. installs that profile's packages from the official repositories
-2. copies its configuration into `~/.config` — and, on Huawei, the Fcitx5 user
-   theme into `~/.local/share/fcitx5/themes`
+2. copies its configuration into `~/.config` — and, on Huawei, the user service
+   units, wrappers, Monique compatibility layer and Fcitx5 theme into their
+   matching home-directory paths
 
 Anything it would overwrite is copied to `~/.dotfiles-backup-<timestamp>/`
 first, and pacman runs with `--needed`, so re-running is safe. Packages that are
@@ -71,7 +77,9 @@ hyprctl reload
 
 ### Manual installation
 
-The Huawei script is equivalent to:
+For Huawei, use the installer to include the service units and local wrappers.
+The following older manual copy list covers only the theme/application files;
+see [Huawei deployment](huawei/README.md) for the additional required entries:
 
 ```bash
 cp -a huawei/.config/hypr ~/.config/
@@ -165,31 +173,29 @@ profiles are defined:
 
 How the pieces fit together:
 
-- `huawei/.config/monique/profiles/` holds the four profile definitions — the
-  real configuration (see `.gitignore` for what is deliberately left out).
-  [monique](https://github.com/ToRvaLDz/monique) is an AUR/third-party tool, so
-  `install-hyprland.sh` only prints it as a hint rather than installing it.
-- `hyprland.lua` loads `monitors.lua` when monique has written one, and falls
-  back to `scripts/project-mode.lua` (port-name rules, no profiles) when it has
-  not. It never applies both: Hyprland honours only the first matching rule per
-  output, so the two sets must not be emitted together.
-- `scripts/monique-switch.sh` writes monique's *pinned* profile **before**
-  switching. Without that ordering, `moniqued` reacts to the monitor hotplug
-  that the switch itself causes, reads the stale pin, and replays the previous
-  profile — which shuffles windows and workspaces between screens.
-- `scripts/restart-waybar.sh` serialises waybar restarts with `flock` and waits
-  for the old process to exit. Several triggers (layout hook, mirror recovery)
-  can fire within the same second, and concurrent `pkill; waybar` pairs leave
-  two bar instances stacked on every screen.
-- Monitor changes are handled in `hyprland.lua`: it corrects workspace
-  ownership, rescues workspaces stranded on a mirror, and disables-then-enables
-  an output that just left mirror mode (Hyprland does not always rebuild its
-  `wl_output`, so waybar would never draw a bar there). Cross-reload state goes
-  through `~/.cache/hypr/monitor-state`.
-- `scripts/project-mode-menu.sh` is the rofi script mode (registered as
-  `project:` in `rofi/config.rasi`), and it marks the active profile with `●`.
-- `scripts/monique-profiles.py` rebuilds all four profiles from the currently
-  detected monitors, and gives `extend` its workspace rules.
+- `huawei/.config/monique/profiles/` contains the authored profiles. Monique is
+  third-party software; the installer does not install it automatically.
+- `hyprland.lua` loads saved output rules through `projection-startup.lua`,
+  which keeps the internal panel usable after booting with HDMI unplugged.
+  Built-in port rules remain a startup fallback when no generated file exists.
+- The local Monique/moniqued wrappers load a compatibility layer tested with
+  **Monique 0.8.3 / Hyprland 0.56.2**. It serializes GUI, CLI and daemon changes,
+  atomically writes state, validates output changes and restores configuration
+  after a failed apply. Its version/API guard must be reviewed after upgrades.
+- `projection-state.lua` waits for stable, committed layouts. Profile assignments
+  apply on a profile/topology change; unrelated reloads preserve manual workspace
+  moves. Orphaned special/named workspaces use explicit selectors, and persistent
+  FALLBACK output failures receive bounded rescue attempts.
+- Mirror-output recreation belongs to the compatibility layer. Waybar recovery
+  never cycles displays: it coalesces requests and restarts the systemd service,
+  preserving its journal and a single process.
+- The projection menu marks the current profile. Switch errors are recorded in
+  `~/.local/state/hyprland/projection.log` and shown with Hyprland's own OSD.
+- `monique-profiles.py` rebuilds authored profiles from connected monitors; it is
+  an explicit regeneration tool, not a login-time state writer.
+
+See [Huawei deployment and validation](huawei/README.md) for the session target,
+PAM input-method environment, optional greetd/system settings and regression tests.
 
 Runtime state is kept out of git (see `.gitignore`):
 

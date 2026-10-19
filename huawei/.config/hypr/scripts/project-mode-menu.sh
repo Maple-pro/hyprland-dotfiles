@@ -20,7 +20,7 @@
 #         project-mode-menu.sh            自己弹一个 rofi -dmenu
 #         project-mode-menu.sh --list     只打印列表（调试）
 #
-# 切换统一走 monique-switch.sh：先写 pin 再切（避免 moniqued 按过期 pin 重放旧档案），
+# 切换统一走 monique-switch.sh：串行完成应用和状态提交（避免与 moniqued 交错），
 # 离开镜像模式后的 wl_output 重建 / waybar 补建由 hyprland.lua 里的钩子负责。
 # -----------------------------------------------------------------------------
 set -uo pipefail

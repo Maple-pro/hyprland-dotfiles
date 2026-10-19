@@ -100,6 +100,7 @@ PACKAGES=(
 	rofi
 	foot
 	dunst
+	libnotify
 
 	# screenshots and clipboard history
 	grim
@@ -155,10 +156,8 @@ PACKAGES=(
 	fsearch
 	kate
 
-	# python3 drives scripts/monique-switch.sh (it rewrites monique's pinned
-	# profile before switching) and scripts/monique-profiles.py (rebuilds the
-	# projection profiles). scripts/restart-waybar.sh also needs flock, which
-	# the base group's util-linux already provides.
+	# Python helpers provide session lifetime tracking, battery/LED state and
+	# Monique compatibility. flock is supplied by the base util-linux package.
 	python
 )
 
@@ -188,11 +187,21 @@ ENTRIES=(
 	.config/gtk-4.0
 	.config/xsettingsd
 	.config/nwg-look
+	.config/systemd/user
 	.config/kdeglobals
 	.config/gtkrc
 	.config/gtkrc-2.0
 	# the Fcitx5 user theme that classicui.conf refers to
 	.local/share/fcitx5/themes/catppuccin-latte-purple
+	.local/share/dbus-1/services/org.freedesktop.Notifications.service
+	.local/share/applications/com.github.monique.desktop
+	.local/lib/monique-hypr56
+	.local/bin/monique
+	.local/bin/moniqued
+	.local/bin/Hyprland
+	.local/bin/et
+	.zprofile
+	.xprofile
 )
 
 # -----------------------------------------------------------------------------
@@ -250,6 +259,26 @@ for rel in "${ENTRIES[@]}"; do
 	install_entry "$rel"
 done
 
+# Generated preferences are not tracked. Seed only deployment policy, never
+# copy this machine's active/pinned profile or overwrite an existing choice.
+MONIQUE_SETTINGS="$TARGET_HOME/.config/monique/settings.json"
+if [[ ! -e "$MONIQUE_SETTINGS" ]]; then
+	cat >"$MONIQUE_SETTINGS" <<'EOF'
+{
+  "hypr_config_format": "lua",
+  "use_port_names": true,
+  "update_sddm": false,
+  "update_greetd": false,
+  "migrate_workspaces": false
+}
+EOF
+	chmod 600 "$MONIQUE_SETTINGS"
+	if [[ ${EUID} -eq 0 ]]; then
+		chown "$TARGET_USER:$TARGET_GROUP" "$MONIQUE_SETTINGS"
+	fi
+	note "created Monique deployment defaults (no saved active profile)"
+fi
+
 # -----------------------------------------------------------------------------
 # Summary
 # -----------------------------------------------------------------------------
@@ -275,7 +304,13 @@ fi
 cat <<EOF
 
 ${BOLD}Next steps${RESET}
-  * Log out and pick the Hyprland session in SDDM, or run: start-hyprland
+  * Run: systemctl --user daemon-reload
+    Then log out and select Hyprland in your login manager, or start-hyprland.
+    The next session imports its environment and starts hyprland-session.target.
+
+  * Read huawei/README.md before deploying the separate etc/ and usr/ snapshots.
+    GTK/QT/XIM/SDL input-method values must be merged into /etc/environment.
+    They are inherited through PAM; the user installer does not modify /etc.
 
   * Two settings live in dconf, so restore them by hand:
         gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Light'
@@ -289,8 +324,19 @@ ${BOLD}Next steps${RESET}
 
   * Super+P opens the projection-mode menu (pc-only / mirror / extend /
     external), also reachable as Ctrl+Tab inside rofi. It needs the monique
-    profiles in .config/monique; without the monique package hyprland.lua
-    falls back to scripts/project-mode.lua and its port-name rules.
+    0.8.3 package for the bundled compatibility layer. No third-party package
+    is installed automatically. Without Monique, startup has built-in output
+    rules; saved Monique profiles alone do not make the switch menu usable.
+
+  * Review an old standalone 'systemctl --user enable moniqued.service' setup:
+    disable that enablement if Monique should run only under this Hyprland target.
+    Do not enable the individual graphical services globally just to autostart.
+
+  * The Caps Lock module reads sysfs LEDs. The input group is not needed.
+    Review other uses before removing that group; log out after a membership change.
+
+  * Low-battery warnings trigger at 20/10/5 percent. Idle locks after ten minutes;
+    before-sleep locking waits for the compositor's actual lock notification.
 
   * hypr/monitors.lua and .config/monique/settings.json are monique runtime
     state and are git-ignored, so they are not part of this profile. That is

@@ -1,0 +1,9 @@
+[Unit]
+Description=Track the lifetime of the current Hyprland compositor
+PartOf=hyprland-session.target
+ConditionEnvironment=HYPRLAND_INSTANCE_SIGNATURE
+
+[Service]
+ExecStart=/home/yangfeng/.config/hypr/scripts/session-guard.py
+Restart=on-failure
+RestartSec=3

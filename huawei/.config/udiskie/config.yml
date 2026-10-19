@@ -21,11 +21,6 @@ program_options:
   # 缓存认证密码，方便挂载需要提权的文件系统
   # password_cache: true
 
-# 注意：本机 My Passport（/dev/sdc1, NTFS）被 Windows 标记为 dirty
-# （实际是"Windows 未完全关机 / 快速启动"留下的未清理状态），
-# 内核 ntfs3 会拒绝读写挂载，udisks2 也禁止传 force 选项：
-#   读写挂载 → Error mounting: wrong fs type, bad option, bad superblock
-#   只读挂载 → 正常（udisksctl mount -b /dev/sdc1 -o ro）
-# 想在 Windows 上继续用就先在 Windows 里 chkdsk / 关闭快速启动；
-# 在 Linux 上可以直接清标记（有风险，确认无 Windows 休眠数据后再执行）：
-#   sudo ntfsfix -d /dev/sdc1
+# NTFS 挂载失败时先检查实际设备、日志和 Windows 休眠状态。
+# /dev/sdX 编号会随插拔变化，不应根据旧记录自动修复或强制挂载。
+# 对休眠/dirty 的 NTFS 卷，优先在 Windows 完整关机并运行文件系统检查。

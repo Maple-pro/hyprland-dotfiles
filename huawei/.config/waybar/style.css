@@ -29,7 +29,7 @@ tooltip label {
 #window,
 #clock,
 #pulseaudio,
-#keyboard-state,
+#custom-keyboard-state,
 #backlight,
 #battery,
 #memory,
@@ -81,7 +81,7 @@ tooltip label {
     color: #40a02b;
 }
 
-#keyboard-state.locked {
+#custom-keyboard-state.locked {
     color: #df8e1d;
 }
 

@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.freedesktop.Notifications
+Exec=/home/yangfeng/.config/hypr/scripts/notification-service.sh

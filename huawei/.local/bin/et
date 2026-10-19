@@ -1,0 +1,10 @@
+#!/bin/sh
+# WPS's bundled Qt 5.12 / spreadsheet canvas fails after RandR output removal.
+# Keep this workaround local to Spreadsheet; the Hyprland session stays Wayland.
+unset QT_SCREEN_SCALE_FACTORS QT_SCALE_FACTOR_ROUNDING_POLICY
+export QT_QPA_PLATFORM=xcb
+export QT_AUTO_SCREEN_SCALE_FACTOR=0
+export QT_SCALE_FACTOR=1
+export QT_FONT_DPI=96
+export QT_XCB_NO_XRANDR=1
+exec /usr/bin/et "$@"

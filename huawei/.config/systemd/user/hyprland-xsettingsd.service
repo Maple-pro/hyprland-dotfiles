@@ -1,0 +1,9 @@
+[Unit]
+Description=XSettings for XWayland applications in Hyprland
+PartOf=hyprland-session.target
+ConditionEnvironment=DISPLAY
+
+[Service]
+ExecStart=/usr/bin/xsettingsd
+Restart=on-failure
+RestartSec=3

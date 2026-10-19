@@ -1,0 +1,14 @@
+#!/bin/sh
+# Executed as the authenticated user, never as the greeter account.
+export PATH="$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin"
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=Hyprland
+export XDG_SESSION_DESKTOP=Hyprland
+if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ] && [ -S "$XDG_RUNTIME_DIR/bus" ]; then
+    export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+fi
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/greetd"
+if mkdir -p "$state_dir"; then
+    exec /usr/bin/start-hyprland "$@" >>"$state_dir/hyprland-session.log" 2>&1
+fi
+exec /usr/bin/start-hyprland "$@"
