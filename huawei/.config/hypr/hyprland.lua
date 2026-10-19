@@ -268,13 +268,16 @@ hl.config({
 -- current view along, so launching an app never steals your focus.
 --
 -- 这张表是"应用默认工作区"的唯一来源，两处用它：
---   1) 下面的 window_rule 把新建窗口直接放到默认工作区；
---   2) 弹窗交给 Hyprland 的父窗口归属，不按 class 猜测。
+--   1) 下面的 window_rule 按 class 把窗口放到默认工作区；
+--   2) scripts/dialog-workspace.lua 在新窗口打开后，把它挪到该应用已有窗口所在的工作区。
+-- 规则故意不区分主窗口/弹窗：弹窗和主窗口同 class，靠第 2 步纠正。这样就不依赖
+-- Hyprland 能否把弹窗识别成 floating / modal —— 很多应用的弹窗两个都不是，
+-- 一旦规则把它们算进来，就会直接落到默认工作区（这就是之前的老问题）。
 -- classes 里写应用真实的窗口 class（`hyprctl clients` 里的 class 字段），
 -- 匹配用的正则由它生成；加应用/改 class 只动这张表。
 local fixedWorkspaceApps = {
 	{ name = "ws-wechat", workspace = 1, classes = { "wechat", "WeChat" } },
-	{ name = "ws-doublecmd", workspace = 2, force_float = true, classes = { "doublecmd", "doublecmd-qt6", "doublecmd-qt", "Double Commander" } },
+	{ name = "ws-doublecmd", workspace = 2, classes = { "doublecmd", "doublecmd-qt6", "doublecmd-qt", "Double Commander" } },
 	{ name = "ws-chrome", workspace = 3, classes = { "google-chrome", "Google-chrome" } },
 	-- WPS 表格 (Spreadsheets)
 	{ name = "ws-spreadsheet", workspace = 4, classes = { "et" } },
@@ -299,15 +302,13 @@ end
 for _, app in ipairs(fixedWorkspaceApps) do
 	hl.window_rule({
 		name = app.name,
-		match = { class = class_regex(app.classes), modal = false, float = false },
+		match = { class = class_regex(app.classes) },
 		workspace = app.workspace .. " silent",
 	})
-
 end
 
--- Ordinary top-level windows keep their default workspace. Native parent placement
--- handles dialogs; the fallback supports native floating/modal dialogs with a
--- unique same-process top-level candidate, excluding forced-floating main windows.
+-- 弹窗跟随：规则先把窗口放到默认工作区，这里再按"应用已有窗口在哪"纠正一次
+-- （不判断 floating/modal，只看 class + 哪个窗口是刚被聚焦的那个）。
 dofile("/home/yangfeng/.config/hypr/scripts/dialog-workspace.lua").setup(hl, fixedWorkspaceApps)
 
 -- FSearch: floating search palette instead of a tiled window.
