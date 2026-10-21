@@ -40,6 +40,7 @@ tooltip label {
     border-radius: 10px;
 }
 
+/* 浅色版的 Legion 配色：保留原有胶囊形状、尺寸和圆角，只调整颜色与状态层次 */
 #workspaces button {
     padding: 0 10px;
     margin: 3px 2px;
@@ -47,29 +48,52 @@ tooltip label {
     font-weight: 600;
     background: #ccd0da;
     border-radius: 999px;
+    box-shadow: inset 0 0 0 1px rgba(156, 160, 176, 0.55);
+    transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+
+#workspaces button.empty {
+    color: #6c6f85;
+    background: #ccd0da;
+    box-shadow: inset 0 0 0 1px rgba(156, 160, 176, 0.32);
+}
+
+#workspaces button:hover {
+    color: #4c4f69;
+    background: #bcc0cc;
+    box-shadow: inset 0 0 0 1px rgba(30, 102, 245, 0.60);
 }
 
 #workspaces button.active {
-    color: #eff1f5;
+    color: #ffffff;
     font-weight: 700;
     background: #8839ef;
+    background-image: linear-gradient(to right, #1e66f5, #8839ef);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
 }
 
-#workspaces button.urgent {
-    color: #eff1f5;
+#workspaces button.active:hover {
+    color: #ffffff;
+    background: #9342f2;
+    background-image: linear-gradient(to right, #2a6aec, #9342f2);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+}
+
+/* 可点击切换 workspace：按下使用实心蓝，和激活渐变区分 */
+#workspaces button:active {
+    color: #ffffff;
+    background: #1e66f5;
+    background-image: none;
+    box-shadow: inset 0 0 0 1px #7287fd;
+}
+
+#workspaces button.urgent,
+#workspaces button.urgent:hover {
+    color: #ffffff;
     font-weight: 700;
     background: #d20f39;
-}
-
-/* 可点击切换 workspace：hover 高亮、按下加深 */
-#workspaces button:hover {
-    background: rgba(30, 102, 245, 0.28);
-    color: #4c4f69;
-}
-
-#workspaces button:active {
-    background: rgba(30, 102, 245, 0.45);
-    color: #4c4f69;
+    background-image: none;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
 }
 
 #clock {
