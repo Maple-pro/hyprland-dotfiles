@@ -1,457 +1,171 @@
-/* ============================================================
-   Waybar · 浮动玻璃胶囊（Catppuccin Mocha / dark）
-   元素与图标保持不变，仅重做视觉层次
-   ============================================================ */
-
-@define-color base      #1e1e2e;
-@define-color text      #cdd6f4;
-@define-color subtext1  #cdd6f4;
-@define-color subtext0  #bac2de;
-@define-color overlay1  #a6adc8;
-@define-color surface1  #45475a;
-@define-color surface2  #585b70;
-
-@define-color blue      #89b4fa;
-@define-color mauve     #cba6f7;
-@define-color pink      #f5c2e7;
-@define-color green     #a6e3a1;
-@define-color teal      #94e2d5;
-@define-color yellow    #f9e2af;
-@define-color peach     #fab387;
-@define-color red       #f38ba8;
-
+/* Translucent Mocha panel with vivid, readable capsule accents. */
+@define-color base #1e1e2e;
+@define-color text #cdd6f4;
+@define-color muted #a6adc8;
+@define-color surface #313244;
+@define-color blue #89b4fa;
+@define-color red #f38ba8;
 * {
     border: none;
     border-radius: 0;
-    font-family: "Hack Nerd Font", "Symbols Nerd Font", "Noto Sans CJK SC", sans-serif;
-    font-size: 14px;
-    min-height: 0;
-}
-
-/* ---------- 顶栏：浮起的磨砂玻璃 ---------- */
-window#waybar {
-    background-color: rgba(24, 24, 37, 0.78);
-    background-image:
-        radial-gradient(circle at 4% 0%, rgba(137, 180, 250, 0.16), transparent 46%),
-        radial-gradient(circle at 96% 0%, rgba(245, 194, 231, 0.20), transparent 44%),
-        linear-gradient(to bottom, rgba(69, 71, 90, 0.50), rgba(69, 71, 90, 0.04));
-    color: @text;
-    border: none;
-    border-radius: 0;
-    box-shadow:
-        inset 0 1px 0 rgba(69, 71, 90, 0.75),
-        inset 0 -1px 0 rgba(108, 112, 134, 0.45);
-    padding: 0 10px;
-}
-
-tooltip {
-    background-color: rgba(30, 30, 46, 0.98);
-    border: none;
-    border-radius: 14px;
-    box-shadow: none;
-}
-
-/* 让阴影跟随圆角，而不是 GTK CSD 的方框 */
-tooltip decoration {
-    background-color: transparent;
-    border: none;
-    border-radius: 14px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
-}
-
-tooltip label {
-    color: @text;
-    font-size: 13px;
-    padding: 8px 12px;
-}
-
-/* 日历（右键时钟） */
-#calendar {
-    background: transparent;
-    color: @text;
-}
-
-#calendar:selected {
-    background-color: @mauve;
-    color: #181825;
-    border-radius: 8px;
-}
-
-#calendar:indeterminate {
-    color: @overlay1;
-}
-
-/* ---------- 工作区：柔和胶囊 + 渐变高亮 ---------- */
-#workspaces {
-    margin: 0 2px 0 0;
-    padding: 0;
-    background: transparent;
-}
-
-#workspaces button {
-    padding: 0 11px;
-    margin: 5px 3px;
-    color: @subtext1;
-    font-size: 15px;
-    font-weight: 600;
-    background-color: rgba(69, 71, 90, 0.82);
-    border-radius: 999px;
-    box-shadow: inset 0 0 0 1px rgba(69, 71, 90, 0.55);
-    transition: background-color 170ms ease, color 170ms ease, box-shadow 170ms ease;
-}
-
-#workspaces button.empty {
-    color: @overlay1;
-    background-color: rgba(49, 50, 68, 0.65);
-    box-shadow: inset 0 0 0 1px rgba(69, 71, 90, 0.82);
-}
-
-#workspaces button:hover {
-    color: @text;
-    background-color: rgba(69, 71, 90, 0.80);
-}
-
-#workspaces button.active {
-    color: #181825;
-    font-weight: 700;
-    background-color: @mauve;
-    background-image: linear-gradient(120deg, #89b4fa 0%, #cba6f7 58%, #f5c2e7 100%);
-    box-shadow:
-        inset 0 1px 0 rgba(69, 71, 90, 0.35),
-        0 3px 10px rgba(203, 166, 247, 0.35);
-}
-
-#workspaces button.active:hover {
-    background-image: linear-gradient(120deg, #a3c5fa 0%, #d5b6fa 58%, #f5c2e7 100%);
-}
-
-#workspaces button.urgent,
-#workspaces button.urgent:hover {
-    color: #181825;
-    font-weight: 700;
-    background-image: linear-gradient(120deg, #f38ba8, #eba0ac);
-    box-shadow:
-        inset 0 1px 0 rgba(69, 71, 90, 0.30),
-        0 3px 10px rgba(243, 139, 168, 0.35);
-}
-
-/* ---------- 窗口标题：低调的标题条 ---------- */
-#window {
-    margin: 5px 6px;
-    padding: 0 14px;
-    color: @subtext0;
-    font-size: 12px;
-    font-weight: 500;
-    background-color: rgba(69, 71, 90, 0.38);
-    border-radius: 12px;
-    box-shadow: inset 0 0 0 1px rgba(69, 71, 90, 0.55);
-}
-
-#window.empty {
-    background-color: transparent;
-    box-shadow: none;
-}
-
-/* ---------- 右侧状态：按强调色着色的胶囊 ---------- */
-#pulseaudio,
-#custom-keyboard-state,
-#backlight,
-#battery,
-#memory,
-#cpu,
-#tray {
-    margin: 5px 0;
-    padding: 0 11px;
-    color: @subtext1;
-    font-size: 13px;
-    font-weight: 600;
-    background-color: rgba(69, 71, 90, 0.46);
-    border-radius: 999px;
-    box-shadow: inset 0 0 0 1px rgba(69, 71, 90, 0.60);
-    transition: background-color 170ms ease, color 170ms ease, box-shadow 170ms ease;
-}
-
-/* 音量 · 绿 */
-#pulseaudio {
-    color: #a6e3a1;
-    background-color: rgba(166, 227, 161, 0.12);
-    box-shadow: inset 0 0 0 1px rgba(166, 227, 161, 0.20);
-}
-
-#pulseaudio.muted {
-    color: @overlay1;
-    background-color: rgba(108, 112, 134, 0.18);
-    box-shadow: inset 0 0 0 1px rgba(108, 112, 134, 0.35);
-}
-
-/* 大写锁定 · 琥珀 */
-#custom-keyboard-state {
-    color: @subtext0;
-    /* Nerd Font 字形本身偏右上，用不对称 padding 把图标拨回胶囊正中 */
-    padding: 3px 13px 0 10px;
-}
-
-#custom-keyboard-state.locked {
-    color: #f9e2af;
-    background-color: rgba(249, 226, 175, 0.17);
-    box-shadow: inset 0 0 0 1px rgba(249, 226, 175, 0.38);
-}
-
-/* 亮度 · 琥珀 */
-#backlight {
-    color: #f9e2af;
-    background-color: rgba(249, 226, 175, 0.13);
-    box-shadow: inset 0 0 0 1px rgba(249, 226, 175, 0.24);
-}
-
-/* 电池 · 青 */
-#battery {
-    color: #94e2d5;
-    background-color: rgba(148, 226, 213, 0.11);
-    box-shadow: inset 0 0 0 1px rgba(148, 226, 213, 0.22);
-}
-
-#battery.charging,
-#battery.plugged {
-    color: #a6e3a1;
-    background-color: rgba(166, 227, 161, 0.14);
-    box-shadow: inset 0 0 0 1px rgba(166, 227, 161, 0.30);
-    animation: charge-pulse 2.4s ease-in-out infinite alternate;
-}
-
-#battery.warning:not(.charging) {
-    color: #f9e2af;
-    background-color: rgba(249, 226, 175, 0.18);
-    box-shadow: inset 0 0 0 1px rgba(249, 226, 175, 0.38);
-}
-
-#battery.critical:not(.charging) {
-    color: @red;
-    background-color: rgba(243, 139, 168, 0.12);
-    box-shadow: inset 0 0 0 1px rgba(243, 139, 168, 0.32);
-    animation: critical-pulse 1.6s ease-in-out infinite;
-}
-
-/* 内存 · 紫 */
-#memory {
-    color: #cba6f7;
-    background-color: rgba(203, 166, 247, 0.10);
-    box-shadow: inset 0 0 0 1px rgba(203, 166, 247, 0.22);
-}
-
-/* CPU · 橙 */
-#cpu {
-    color: #fab387;
-    background-color: rgba(250, 179, 135, 0.10);
-    box-shadow: inset 0 0 0 1px rgba(250, 179, 135, 0.22);
-}
-
-/* 托盘 */
-#tray {
-    padding: 0 9px;
-    color: @text;
-    background-color: rgba(69, 71, 90, 0.50);
-}
-
-#tray > .passive {
-    -gtk-icon-effect: dim;
-}
-
-#tray > .needs-attention {
-    background-color: rgba(250, 179, 135, 0.20);
-    border-radius: 9px;
-    box-shadow: inset 0 0 0 1px rgba(250, 179, 135, 0.35);
-}
-
-/* 悬停统一抬升 */
-#pulseaudio:hover,
-#custom-keyboard-state:hover,
-#backlight:hover,
-#battery:hover,
-#memory:hover,
-#cpu:hover,
-#tray:hover {
-    background-color: rgba(69, 71, 90, 0.78);
-}
-
-/* ---------- 时钟：整条栏的视觉焦点 ---------- */
-#clock {
-    margin: 5px 0 5px 3px;
-    padding: 0 16px;
-    color: #181825;
-    font-size: 14px;
-    font-weight: 700;
-    background-color: @mauve;
-    background-image: linear-gradient(115deg, #89b4fa 0%, #cba6f7 58%, #f5c2e7 100%);
-    border-radius: 999px;
-    text-shadow: none;
-    box-shadow:
-        inset 0 1px 0 rgba(69, 71, 90, 0.32),
-        0 3px 12px rgba(137, 180, 250, 0.30);
-    transition: box-shadow 180ms ease;
-}
-
-/* ---------- 托盘菜单 ---------- */
-menu {
-    background-color: rgba(24, 24, 37, 0.98);
-    border: 1px solid rgba(88, 91, 112, 0.85);
-    border-radius: 12px;
-    padding: 6px;
-}
-
-menu menuitem {
-    color: @text;
-    border-radius: 8px;
-    padding: 6px 10px;
-}
-
-menu menuitem:hover {
-    background-color: rgba(203, 166, 247, 0.14);
-}
-
-/* ---------- 动画 ---------- */
-@keyframes charge-pulse {
-    from {
-        background-color: rgba(166, 227, 161, 0.10);
-    }
-    to {
-        background-color: rgba(166, 227, 161, 0.26);
-    }
-}
-
-@keyframes critical-pulse {
-    0% {
-        background-color: rgba(243, 139, 168, 0.10);
-        color: #f38ba8;
-    }
-    50% {
-        background-color: rgba(243, 139, 168, 0.30);
-        color: #f38ba8;
-    }
-    100% {
-        background-color: rgba(243, 139, 168, 0.10);
-        color: #f38ba8;
-    }
-}
-
-/* Legion microphone capsule retains the existing mute/status behavior. */
-#custom-mic {
-    margin: 5px 0;
-    padding: 0 11px;
-    border-radius: 999px;
-    color: #a6e3a1;
-    background-color: rgba(166, 227, 161, 0.12);
-}
-#custom-mic.muted { color: #f38ba8; background-color: rgba(243, 139, 168, 0.14); }
-#custom-mic:hover { background-color: rgba(69, 71, 90, 0.78); }
-#custom-clash-party.running { color: #f9e2af; }
-#custom-clash-party.stopped { color: #a6adc8; }
-
-/* Use the desktop text font for tooltips, without monospace icon fallback. */
-tooltip label, tooltip calendar {
-    font-family: "Noto Sans", "Noto Sans CJK SC", sans-serif;
-    font-size: 13px;
-    font-weight: normal;
-}
-/* Nerd Font microphone glyph sits high/right within its advance width. */
-#custom-mic { padding: 3px 13px 0 10px; }
-
-/* Set sizes on labels: the global * rule sets 14px directly on children. */
-#window label {
-    font-size: 12px;
-    font-weight: normal;
-}
-#workspaces button label {
-    font-size: 15px;
-    font-weight: 600;
-}
-
-/* Legion: 2048 logical pixels at 1.25 scaling, 38px bar. */
-#window label {
-    font-family: "Noto Sans", "Noto Sans CJK SC", sans-serif;
-    font-size: 12px;
-    font-weight: normal;
-}
-#window { padding: 0 11px; margin: 5px 4px; }
-#workspaces button { padding: 0 10px; margin: 5px 2px; }
-#workspaces button label { font-size: 15px; }
-#pulseaudio label,
-#custom-mic label,
-#custom-keyboard-state label,
-#backlight label,
-#battery label,
-#memory label,
-#cpu label,
-#clock label {
     font-family: "Noto Sans", "Symbols Nerd Font", "Noto Sans CJK SC", sans-serif;
     font-size: 13px;
-    font-weight: 600;
+    min-height: 0;
 }
-#pulseaudio, #backlight, #battery, #memory, #cpu { padding: 0 10px; }
-#clock { padding: 0 14px; text-shadow: none; }
-#clock label { font-weight: 700; }
-#custom-keyboard-state { padding: 1px 11px 0 9px; }
-#custom-mic { padding: 1px 11px 0 9px; }
-#pulseaudio.muted { color: #bac2de; background-color: rgba(88, 91, 112, 0.40); }
-
-/* One capsule geometry and a shared clock-inspired blue/mauve palette. */
-#tray {
-    margin: 5px 2px;
+window#waybar {
+    background-color: rgba(30, 30, 46, 0.72);
+    background-image: none;
+    color: @text;
+    box-shadow: inset 0 -1px 0 rgba(137, 180, 250, 0.18);
     padding: 0 10px;
+}
+#workspaces { margin: 0 2px 0 0; padding: 0; background: transparent; }
+#workspaces button {
+    padding: 0 10px;
+    margin: 5px 2px;
     border-radius: 999px;
-    background-color: rgba(69, 71, 90, 0.82);
-    background-image: none;
-    box-shadow: inset 0 0 0 1px rgba(203, 166, 247, 0.38);
+    color: #bac2de;
+    background-color: #313244;
+    box-shadow: none;
+    transition: background-color 150ms ease, color 150ms ease;
 }
-#pulseaudio,
-#pulseaudio.muted,
-#backlight,
-#battery,
-#battery.charging,
-#battery.plugged,
-#memory,
-#cpu,
-#custom-mic,
-#custom-mic.active,
-#custom-keyboard-state {
-    margin: 5px 0;
-    border-radius: 999px;
-    color: #e3ddfa;
-    background-color: #514466;
-    background-image: linear-gradient(115deg, #424e73 0%, #514466 58%, #61445f 100%);
-    box-shadow: inset 0 0 0 1px rgba(203, 166, 247, 0.38);
-    animation: none;
-}
-#pulseaudio:hover, #backlight:hover, #memory:hover, #cpu:hover,
-#battery:hover, #custom-mic:hover, #custom-keyboard-state:hover {
-    background-image: linear-gradient(115deg, #52628c, #66517d, #765374);
-}
-/* Keep exceptions meaningful: muted microphone, Caps Lock and battery alerts. */
-#custom-mic.muted {
-    color: #f38ba8;
-    background-image: none;
-    background-color: #553342;
-}
-#custom-keyboard-state.locked { color: #f5c2e7; }
-#battery.warning:not(.charging), #battery.critical:not(.charging) {
-    color: #f38ba8;
-    background-image: none;
-    background-color: #553342;
-}
-
-/* Window title shares the neutral capsule surface and silhouette. */
+#workspaces button label { font-size: 13px; font-weight: 600; }
+#workspaces button.empty { color: #7f849c; background-color: #262637; }
+#workspaces button:hover { color: @text; background-color: #45475a; }
+#workspaces button.active { color: #c6dbff; background-color: #364563; }
+#workspaces button.active:hover { background-color: #425578; }
+#workspaces button.urgent { color: #f38ba8; background-color: #49303f; }
 #window {
     margin: 5px 2px;
     padding: 0 11px;
-    border-radius: 999px;
-    color: #cdd6f4;
-    background-color: rgba(69, 71, 90, 0.90);
-    background-image: none;
-    box-shadow: inset 0 0 0 1px rgba(166, 173, 200, 0.30);
+    border-radius: 0;
+    color: #bac2de;
+    background: transparent;
+    box-shadow: none;
 }
-#window label {
-    color: #cdd6f4;
-    font-size: 12px;
+#window label { font-size: 13px; font-weight: 700; }
+#pulseaudio, #custom-mic, #custom-keyboard-state, #backlight,
+#battery, #memory, #cpu, #tray, #clock {
+    margin: 5px 0;
+    padding: 0 10px;
+    border-radius: 999px;
+    color: @text;
+    background-color: #2b2b3e;
+    background-image: none;
+    box-shadow: none;
+    transition: background-color 150ms ease;
+}
+#pulseaudio label, #custom-mic label, #custom-keyboard-state label,
+#backlight label, #battery label, #memory label, #cpu label, #clock label {
+    font-size: 13px;
     font-weight: 600;
 }
-#window.empty { background-color: transparent; box-shadow: none; }
+#pulseaudio { color: #a6d5b0; }
+#custom-mic { color: #a6d5b0; padding: 0 11px; }
+#custom-keyboard-state { color: @muted; padding: 0 11px; }
+#backlight { color: #e5cd9b; }
+#battery { color: #94cfc7; }
+#memory { color: #c3b0df; }
+#cpu { color: #d9b397; }
+#pulseaudio.muted { color: #9399b2; }
+#custom-mic.muted { color: #e8a0b2; background-color: #3b2c3b; }
+#custom-keyboard-state.locked { color: #e5cd9b; background-color: #3b3540; }
+#battery.charging, #battery.plugged { color: #a6d5b0; }
+#battery.warning:not(.charging) { color: #e5cd9b; background-color: #3b3540; }
+#battery.critical:not(.charging) { color: #f38ba8; background-color: #49303f; }
+#pulseaudio:hover, #custom-mic:hover, #custom-keyboard-state:hover,
+#backlight:hover, #battery:hover, #memory:hover, #cpu:hover, #tray:hover {
+    background-color: #3b3d53;
+}
+#tray { margin: 5px 2px; background-color: #272738; padding: 0 10px; }
+#tray > .passive { -gtk-icon-effect: dim; }
+#tray > .needs-attention { background-color: #49303f; border-radius: 6px; }
+#clock { margin-left: 3px; padding: 0 14px; color: #c6dbff; background-color: #364563; }
+#clock label { font-weight: 700; }
+#clock:hover { background-color: #425578; }
+tooltip, menu {
+    background-color: #1e1e2e;
+    color: @text;
+    border: 1px solid #45475a;
+    border-radius: 10px;
+    box-shadow: none;
+}
+tooltip decoration { background: transparent; box-shadow: none; }
+tooltip label, tooltip calendar { font-size: 15px; font-weight: normal; color: @text; }
+tooltip label { padding: 10px 14px; }
+#calendar { background: transparent; color: @text; }
+#calendar:selected { color: #c6dbff; background-color: #364563; border-radius: 6px; }
+#calendar:indeterminate { color: @muted; }
+menu { padding: 6px; }
+menu menuitem { color: @text; padding: 6px 10px; border-radius: 6px; }
+menu menuitem:hover { background-color: #364563; }
+#custom-clash-party.running { color: #e5cd9b; }
+#custom-clash-party.stopped { color: @muted; }
+
+/* Vivid capsules sit above the translucent panel; title remains plain. */
+#workspaces button.active, #clock {
+    color: #eff4ff;
+    background-color: #5262a3;
+    background-image: linear-gradient(115deg, #3d659e, #72509e);
+    box-shadow: inset 0 0 0 1px rgba(180, 190, 254, 0.40);
+}
+#workspaces button.active:hover, #clock:hover {
+    background-image: linear-gradient(115deg, #4b78b7, #865fba);
+}
+#pulseaudio, #custom-mic {
+    color: #b5f0c7;
+    background-color: #284b40;
+    box-shadow: inset 0 0 0 1px rgba(166, 227, 161, 0.25);
+}
+#pulseaudio.muted { color: #add1bd; background-color: #30443f; }
+#custom-keyboard-state {
+    color: #c5caff;
+    background-color: #3e3f67;
+    box-shadow: inset 0 0 0 1px rgba(180, 190, 254, 0.25);
+}
+#backlight, #custom-keyboard-state.locked {
+    color: #ffe2a1;
+    background-color: #59462e;
+    box-shadow: inset 0 0 0 1px rgba(249, 226, 175, 0.28);
+}
+#battery, #battery.charging, #battery.plugged {
+    color: #a5f0e2;
+    background-color: #254e50;
+    box-shadow: inset 0 0 0 1px rgba(148, 226, 213, 0.28);
+}
+#memory {
+    color: #e2c2ff;
+    background-color: #503766;
+    box-shadow: inset 0 0 0 1px rgba(203, 166, 247, 0.28);
+}
+#cpu {
+    color: #ffd0ac;
+    background-color: #603f33;
+    box-shadow: inset 0 0 0 1px rgba(250, 179, 135, 0.28);
+}
+#pulseaudio:hover, #custom-mic:hover { background-color: #365f4e; }
+#backlight:hover, #custom-keyboard-state.locked:hover { background-color: #6b5536; }
+#custom-keyboard-state:hover { background-color: #50517e; }
+#battery:hover { background-color: #306467; }
+#memory:hover { background-color: #654681; }
+#cpu:hover { background-color: #78503f; }
+#custom-mic.muted, #custom-mic.muted:hover,
+#battery.critical:not(.charging), #battery.critical:not(.charging):hover {
+    color: #ffb3c8;
+    background-color: #643348;
+    box-shadow: inset 0 0 0 1px rgba(243, 139, 168, 0.35);
+}
+#battery.warning:not(.charging), #battery.warning:not(.charging):hover {
+    color: #ffe2a1;
+    background-color: #59462e;
+    box-shadow: inset 0 0 0 1px rgba(249, 226, 175, 0.28);
+}
+/* Give the application tray a clear silhouette above the translucent bar. */
+#tray {
+    background-color: #454560;
+    box-shadow: inset 0 0 0 1px rgba(180, 190, 254, 0.48);
+}
+#tray:hover {
+    background-color: #535376;
+    box-shadow: inset 0 0 0 1px rgba(180, 190, 254, 0.65);
+}

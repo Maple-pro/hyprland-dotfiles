@@ -1,0 +1,10 @@
+[Icon Theme]
+Name=Waybar Dark
+Comment=Papirus dark panel icons with monochrome input method indicators
+Inherits=Papirus-Dark
+Directories=22x22/status
+
+[22x22/status]
+Size=22
+Context=Status
+Type=Fixed
