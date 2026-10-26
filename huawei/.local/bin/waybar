@@ -1,0 +1,13 @@
+#!/bin/sh
+# Waybar 0.15.0 from the Arch repositories still sends the legacy Hyprland IPC
+# dispatch syntax ("dispatch workspace N"), which Hyprland >= 0.55 rejects when
+# the config provider is Lua, so workspace clicks do nothing.
+#
+# ~/.local/lib/waybar-git/waybar is a newer build with the Lua IPC adaptation
+# (installed by huawei/update-waybar-git.sh). Use it when present; otherwise
+# fall back to the packaged binary so the bar still starts (clicks stay broken
+# until the local build is installed).
+if [ -x "$HOME/.local/lib/waybar-git/waybar" ]; then
+	exec "$HOME/.local/lib/waybar-git/waybar" "$@"
+fi
+exec /usr/bin/waybar "$@"

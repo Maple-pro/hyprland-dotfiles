@@ -168,6 +168,9 @@ UNAVAILABLE=(
 	"monique          AUR / third-party — the monitor-profile tool behind Super+P."
 	"                 Without it hyprland.lua falls back to the built-in rules in"
 	"                 scripts/project-mode.lua (port names, no profiles)."
+	"waybar-git       archlinuxcn — needed for workspace clicks under Hyprland's"
+	"                 Lua config; huawei/update-waybar-git.sh installs the verified"
+	"                 build under ~/.local/lib without pacman."
 )
 
 # -----------------------------------------------------------------------------
@@ -200,6 +203,7 @@ ENTRIES=(
 	.local/bin/moniqued
 	.local/bin/Hyprland
 	.local/bin/et
+	.local/bin/waybar
 	.zprofile
 	.xprofile
 )
@@ -293,6 +297,10 @@ if [[ -d "$BACKUP_DIR" ]]; then
 	note "anything overwritten was saved under $BACKUP_DIR"
 fi
 
+if [[ ! -x "$TARGET_HOME/.local/lib/waybar-git/waybar" ]]; then
+	note "Waybar workspace clicks need the local Lua-IPC build: run 'bash huawei/update-waybar-git.sh' once"
+fi
+
 if ((${#UNAVAILABLE[@]} > 0)); then
 	echo
 	say "Not in the official repositories — install manually if you want them"
@@ -307,6 +315,12 @@ ${BOLD}Next steps${RESET}
   * Run: systemctl --user daemon-reload
     Then log out and select Hyprland in your login manager, or start-hyprland.
     The next session imports its environment and starts hyprland-session.target.
+
+  * Waybar workspace clicks need the Lua-IPC-compatible build:
+        bash huawei/update-waybar-git.sh
+    The installer already placed the wrapper and drop-in. Until the local
+    build is installed the wrapper falls back to /usr/bin/waybar: the bar
+    works, clicks stay broken. See huawei/README.md.
 
   * Read huawei/README.md before deploying the separate etc/ and usr/ snapshots.
     GTK/QT/XIM/SDL input-method values must be merged into /etc/environment.

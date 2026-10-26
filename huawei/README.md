@@ -101,6 +101,36 @@ Waybar 强制使用 Wayland 后端；重启由 systemd 管理，日志进入 jou
 - Monique 兼容层承担镜像输出重建、验证和失败恢复；状态栏恢复不主动关开显示器。
 - 新投影仪不支持档案中的模式时回退到 preferred；切换失败用 Hyprland OSD 提示并记日志。
 
+## Waybar 工作区点击与 waybar-git 覆盖
+
+Hyprland 0.56 使用 Lua 配置时，IPC dispatch 只接受 `hl.dsp.*` 表达式。Arch 仓库的
+Waybar 0.15.0 点击工作区按钮仍发送旧语法 `dispatch workspace N`，Hyprland 会拒绝，
+表现为点击无反应（Debian #1136724、Waybar #5294）。
+
+本配置用包装脚本和 drop-in 保留可回退路径：
+
+- `.local/bin/waybar`：存在 `~/.local/lib/waybar-git/waybar` 时使用该构建，否则回退
+  到 `/usr/bin/waybar`（状态栏正常，点击仍不可用）；
+- `.config/systemd/user/waybar.service.d/20-local-waybar-git.conf`：
+  `ExecStart=%h/.local/bin/waybar`。
+
+安装已验证的 waybar-git 构建（x86_64，来自 archlinuxcn；不经过 pacman，不替换
+发行版包）：
+
+```bash
+bash huawei/update-waybar-git.sh
+systemctl --user daemon-reload
+systemctl --user restart waybar.service
+```
+
+脚本校验包 SHA-256 和二进制中的 Lua IPC 支持；也可传入本地
+`waybar-git-*.pkg.tar.zst` 或自定义 URL。安装位置是
+`~/.local/lib/waybar-git/waybar`。2026-10-26 已在本机用真实点击验证：点击 4 号
+workspace 切到 4，点击 3 号切回 3。
+
+官方 `waybar` 包合入该修复后，删除 `~/.local/lib/waybar-git/` 和上述 drop-in，
+再运行一次安装器即可；包装脚本可以保留，它会回退到 `/usr/bin/waybar`。
+
 ## 验证
 
 从仓库根目录运行：

@@ -14,6 +14,10 @@ waybar=json.loads(re.sub(r'//[^\n]*','',(root/'.config/waybar/config.jsonc').rea
 assert waybar['clock']['actions']['on-click-right']=='mode'
 assert 'keyboard-state' not in waybar and 'custom/keyboard-state' in waybar
 assert '-n2' in waybar['backlight']['on-scroll-down']
+wrapper=(root/'.local/bin/waybar').read_text()
+assert 'waybar-git/waybar' in wrapper and 'exec /usr/bin/waybar' in wrapper
+dropin=(root/'.config/systemd/user/waybar.service.d/20-local-waybar-git.conf').read_text()
+assert 'ExecStart=%h/.local/bin/waybar' in dropin
 installer=(root/'install-hyprland.sh').read_text()
 entries=re.search(r'ENTRIES=\(\n(.*?)\n\)',installer,re.S).group(1)
 for line in entries.splitlines():

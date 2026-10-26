@@ -25,7 +25,7 @@ huawei/.config/gtk-4.0/              GTK4 settings (gtk.css symlinked into the s
 huawei/.config/xsettingsd/           xsettingsd GTK/XSETTINGS daemon settings
 huawei/.config/nwg-look/             nwg-look export preferences (produced the GTK files above)
 huawei/.config/systemd/user/        Hyprland session services and drop-ins
-huawei/.local/bin/                  Monique, Hyprland and WPS Spreadsheet wrappers
+huawei/.local/bin/                  Monique, Hyprland, WPS Spreadsheet and Waybar wrappers
 huawei/.local/lib/monique-hypr56/    Version-guarded Monique compatibility
 huawei/etc/, huawei/usr/            System configuration snapshots (manual deployment)
 huawei/tests/                      Repository-local behavior and syntax checks
@@ -38,6 +38,7 @@ legion/.config/monique/profiles/     Legion projection profiles
 legion/.config/foot/                 Foot terminal
 legion/.config/dunst/                Dunst notifications
 huawei/install-hyprland.sh           Huawei package + configuration installer
+huawei/update-waybar-git.sh          Optional Lua-IPC-compatible Waybar build (workspace clicks)
 huawei/setup-mx150.sh                GeForce MX150 (580xx legacy) driver setup
 legion/install-hyprland.sh           Legion package + configuration installer
 Hyprland_Guide.md                    Basic usage guide
@@ -68,6 +69,18 @@ first, and pacman runs with `--needed`, so re-running is safe. Packages that are
 not in the official repositories are printed at the end rather than installed,
 so no AUR helper is required. Running the script as your normal user is
 preferred: it escalates with `sudo` only for pacman.
+
+On Huawei, workspace clicks in Waybar need a Lua-IPC-compatible build (the
+packaged 0.15.0 still sends the legacy Hyprland dispatch syntax). After the
+installer, run:
+
+```bash
+bash huawei/update-waybar-git.sh
+```
+
+The profile ships a wrapper and a systemd drop-in that fall back to
+`/usr/bin/waybar` until then: the bar still works, clicks stay broken. See
+[Huawei deployment](huawei/README.md).
 
 After copying or editing the Hyprland config, reload it with:
 
