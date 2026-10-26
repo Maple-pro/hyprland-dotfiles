@@ -25,16 +25,16 @@ window#waybar {
     margin: 5px 2px;
     border-radius: 999px;
     color: #bac2de;
-    background-color: #313244;
+    background-color: rgba(49, 50, 68, 0.90);
     box-shadow: none;
     transition: background-color 150ms ease, color 150ms ease;
 }
 #workspaces button label { font-size: 13px; font-weight: 600; }
-#workspaces button.empty { color: #7f849c; background-color: #262637; }
-#workspaces button:hover { color: @text; background-color: #45475a; }
-#workspaces button.active { color: #c6dbff; background-color: #364563; }
-#workspaces button.active:hover { background-color: #425578; }
-#workspaces button.urgent { color: #f38ba8; background-color: #49303f; }
+#workspaces button.empty { color: #7f849c; background-color: rgba(38, 38, 55, 0.90); }
+#workspaces button:hover { color: @text; background-color: rgba(69, 71, 90, 0.90); }
+#workspaces button.active { color: #c6dbff; background-color: rgba(54, 69, 99, 0.90); }
+#workspaces button.active:hover { background-color: rgba(66, 85, 120, 0.90); }
+#workspaces button.urgent { color: #f38ba8; background-color: rgba(73, 48, 63, 0.90); }
 #window {
     margin: 5px 2px;
     padding: 0 11px;
@@ -50,7 +50,7 @@ window#waybar {
     padding: 0 10px;
     border-radius: 999px;
     color: @text;
-    background-color: #2b2b3e;
+    background-color: rgba(43, 43, 62, 0.90);
     background-image: none;
     box-shadow: none;
     transition: background-color 150ms ease;
@@ -68,23 +68,23 @@ window#waybar {
 #memory { color: #c3b0df; }
 #cpu { color: #d9b397; }
 #pulseaudio.muted { color: #9399b2; }
-#custom-mic.muted { color: #e8a0b2; background-color: #3b2c3b; }
-#custom-keyboard-state.locked { color: #e5cd9b; background-color: #3b3540; }
+#custom-mic.muted { color: #e8a0b2; background-color: rgba(59, 44, 59, 0.90); }
+#custom-keyboard-state.locked { color: #e5cd9b; background-color: rgba(59, 53, 64, 0.90); }
 #battery.charging, #battery.plugged { color: #a6d5b0; }
-#battery.warning:not(.charging) { color: #e5cd9b; background-color: #3b3540; }
-#battery.critical:not(.charging) { color: #f38ba8; background-color: #49303f; }
+#battery.warning:not(.charging) { color: #e5cd9b; background-color: rgba(59, 53, 64, 0.90); }
+#battery.critical:not(.charging) { color: #f38ba8; background-color: rgba(73, 48, 63, 0.90); }
 #pulseaudio:hover, #custom-mic:hover, #custom-keyboard-state:hover,
 #backlight:hover, #battery:hover, #memory:hover, #cpu:hover, #tray:hover {
-    background-color: #3b3d53;
+    background-color: rgba(59, 61, 83, 0.90);
 }
-#tray { margin: 5px 2px; background-color: #272738; padding: 0 10px; }
+#tray { margin: 5px 2px; background-color: rgba(39, 39, 56, 0.90); padding: 0 10px; }
 #tray > .passive { -gtk-icon-effect: dim; }
-#tray > .needs-attention { background-color: #49303f; border-radius: 6px; }
-#clock { margin-left: 3px; padding: 0 14px; color: #c6dbff; background-color: #364563; }
+#tray > .needs-attention { background-color: rgba(73, 48, 63, 0.90); border-radius: 6px; }
+#clock { margin-left: 3px; padding: 0 14px; color: #c6dbff; background-color: rgba(54, 69, 99, 0.90); }
 #clock label { font-weight: 700; }
-#clock:hover { background-color: #425578; }
+#clock:hover { background-color: rgba(66, 85, 120, 0.90); }
 tooltip, menu {
-    background-color: #1e1e2e;
+    background-color: rgba(30, 30, 46, 0.90);
     color: @text;
     border: 1px solid #45475a;
     border-radius: 10px;
@@ -94,78 +94,78 @@ tooltip decoration { background: transparent; box-shadow: none; }
 tooltip label, tooltip calendar { font-size: 15px; font-weight: normal; color: @text; }
 tooltip label { padding: 10px 14px; }
 #calendar { background: transparent; color: @text; }
-#calendar:selected { color: #c6dbff; background-color: #364563; border-radius: 6px; }
+#calendar:selected { color: #c6dbff; background-color: rgba(54, 69, 99, 0.90); border-radius: 6px; }
 #calendar:indeterminate { color: @muted; }
 menu { padding: 6px; }
 menu menuitem { color: @text; padding: 6px 10px; border-radius: 6px; }
-menu menuitem:hover { background-color: #364563; }
+menu menuitem:hover { background-color: rgba(54, 69, 99, 0.90); }
 #custom-clash-party.running { color: #e5cd9b; }
 #custom-clash-party.stopped { color: @muted; }
 
-/* Vivid capsules sit above the translucent panel; title remains plain. */
+/* Capsule and popup backgrounds use 90% opacity; text stays opaque. */
 #workspaces button.active, #clock {
     color: #eff4ff;
-    background-color: #5262a3;
-    background-image: linear-gradient(115deg, #3d659e, #72509e);
+    background-color: transparent;
+    background-image: linear-gradient(115deg, rgba(61, 101, 158, 0.90), rgba(114, 80, 158, 0.90));
     box-shadow: inset 0 0 0 1px rgba(180, 190, 254, 0.40);
 }
 #workspaces button.active:hover, #clock:hover {
-    background-image: linear-gradient(115deg, #4b78b7, #865fba);
+    background-image: linear-gradient(115deg, rgba(75, 120, 183, 0.90), rgba(134, 95, 186, 0.90));
 }
 #pulseaudio, #custom-mic {
     color: #b5f0c7;
-    background-color: #284b40;
+    background-color: rgba(40, 75, 64, 0.90);
     box-shadow: inset 0 0 0 1px rgba(166, 227, 161, 0.25);
 }
-#pulseaudio.muted { color: #add1bd; background-color: #30443f; }
+#pulseaudio.muted { color: #add1bd; background-color: rgba(48, 68, 63, 0.90); }
 #custom-keyboard-state {
     color: #c5caff;
-    background-color: #3e3f67;
+    background-color: rgba(62, 63, 103, 0.90);
     box-shadow: inset 0 0 0 1px rgba(180, 190, 254, 0.25);
 }
 #backlight, #custom-keyboard-state.locked {
     color: #ffe2a1;
-    background-color: #59462e;
+    background-color: rgba(89, 70, 46, 0.90);
     box-shadow: inset 0 0 0 1px rgba(249, 226, 175, 0.28);
 }
 #battery, #battery.charging, #battery.plugged {
     color: #a5f0e2;
-    background-color: #254e50;
+    background-color: rgba(37, 78, 80, 0.90);
     box-shadow: inset 0 0 0 1px rgba(148, 226, 213, 0.28);
 }
 #memory {
     color: #e2c2ff;
-    background-color: #503766;
+    background-color: rgba(80, 55, 102, 0.90);
     box-shadow: inset 0 0 0 1px rgba(203, 166, 247, 0.28);
 }
 #cpu {
     color: #ffd0ac;
-    background-color: #603f33;
+    background-color: rgba(96, 63, 51, 0.90);
     box-shadow: inset 0 0 0 1px rgba(250, 179, 135, 0.28);
 }
-#pulseaudio:hover, #custom-mic:hover { background-color: #365f4e; }
-#backlight:hover, #custom-keyboard-state.locked:hover { background-color: #6b5536; }
-#custom-keyboard-state:hover { background-color: #50517e; }
-#battery:hover { background-color: #306467; }
-#memory:hover { background-color: #654681; }
-#cpu:hover { background-color: #78503f; }
+#pulseaudio:hover, #custom-mic:hover { background-color: rgba(54, 95, 78, 0.90); }
+#backlight:hover, #custom-keyboard-state.locked:hover { background-color: rgba(107, 85, 54, 0.90); }
+#custom-keyboard-state:hover { background-color: rgba(80, 81, 126, 0.90); }
+#battery:hover { background-color: rgba(48, 100, 103, 0.90); }
+#memory:hover { background-color: rgba(101, 70, 129, 0.90); }
+#cpu:hover { background-color: rgba(120, 80, 63, 0.90); }
 #custom-mic.muted, #custom-mic.muted:hover,
 #battery.critical:not(.charging), #battery.critical:not(.charging):hover {
     color: #ffb3c8;
-    background-color: #643348;
+    background-color: rgba(100, 51, 72, 0.90);
     box-shadow: inset 0 0 0 1px rgba(243, 139, 168, 0.35);
 }
 #battery.warning:not(.charging), #battery.warning:not(.charging):hover {
     color: #ffe2a1;
-    background-color: #59462e;
+    background-color: rgba(89, 70, 46, 0.90);
     box-shadow: inset 0 0 0 1px rgba(249, 226, 175, 0.28);
 }
 /* Give the application tray a clear silhouette above the translucent bar. */
 #tray {
-    background-color: #454560;
+    background-color: rgba(69, 69, 96, 0.90);
     box-shadow: inset 0 0 0 1px rgba(180, 190, 254, 0.48);
 }
 #tray:hover {
-    background-color: #535376;
+    background-color: rgba(83, 83, 118, 0.90);
     box-shadow: inset 0 0 0 1px rgba(180, 190, 254, 0.65);
 }

@@ -16,14 +16,18 @@
 #     协议（rofi-script(5)）：ROFI_RETV=0 时输出列表；ROFI_RETV=1 时 $1 是选中的
 #     条目。处理完不输出任何东西，rofi 会自动关闭。
 #
-#  2) 直接运行（终端里用，或者没注册 modi 时）
-#         project-mode-menu.sh            自己弹一个 rofi -dmenu
+#  2) 直接运行（终端或快捷键）
+#         project-mode-menu.sh            打开共享 rofi 的 project 模式
 #         project-mode-menu.sh --list     只打印列表（调试）
 #
 # 切换统一走 monique-switch.sh：先写 pin 再切（避免 moniqued 按过期 pin 重放旧档案），
 # 离开镜像模式后的 wl_output 重建 / waybar 补建由 hyprland.lua 里的钩子负责。
 # -----------------------------------------------------------------------------
 set -uo pipefail
+
+if [ -z "${ROFI_RETV:-}" ] && [ "${1:-}" != "--list" ]; then
+    exec rofi -show project
+fi
 
 HOME_DIR=${HOME:-/root}
 PROFILE_DIR="$HOME_DIR/.config/monique/profiles"
@@ -163,8 +167,3 @@ if [ -n "${ROFI_RETV:-}" ]; then
 	fi
 	exit 0
 fi
-
-# ---- 直接运行：自己弹一个 rofi -dmenu ----
-choice=$(render | rofi -dmenu -i -p "Projection")
-[ -n "${choice:-}" ] || exit 0
-apply "$choice" || true

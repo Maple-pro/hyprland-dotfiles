@@ -1,5 +1,5 @@
 * {
-    background-color: rgba(30, 30, 46, 0.96);
+    background-color: transparent;
     foreground-color: #cdd6f4;
     border-color: #313244;
     selected-normal-background: rgba(137, 180, 250, 0.18);
@@ -13,6 +13,7 @@
 }
 
 window {
+    background-color: rgba(30, 30, 46, 0.90);
     fullscreen: false;
     width: 36%;
     x-offset: 0;

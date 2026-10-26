@@ -1,11 +1,15 @@
 configuration {
-    modi: "drun,run,window,keybinds:/home/yangfeng/.config/hypr/scripts/keybinds.lua,project:/home/yangfeng/.config/hypr/scripts/project-mode-menu.sh";
+    modi: "drun,run,window,keybinds:/home/yangfeng/.config/hypr/scripts/keybinds.lua,project:/home/yangfeng/.config/hypr/scripts/project-mode-menu.sh,clipboard:/home/yangfeng/.config/hypr/scripts/clipboard-menu.sh,power:/home/yangfeng/.config/hypr/scripts/powermenu.sh";
     show-icons: true;
     display-drun: "Applications";
     display-run: "Run";
     display-window: "Windows";
     display-keybinds: "Keybinds";
     display-project: "Projection";
+    display-clipboard: "Clipboard";
+    display-power: "Power";
+    kb-mode-next: "Shift+Right,Control+Tab";
+    kb-mode-previous: "Shift+Left,Control+ISO_Left_Tab";
     drun-display-format: "{name}";
     location: 0;
     width: 36%;

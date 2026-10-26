@@ -31,19 +31,19 @@
     transparency = 0
 
 [urgency_low]
-    background = "#313244"
+    background = "#313244b8"
     foreground = "#cdd6f4"
     frame_color = "#89b4fa"
     timeout = 4
 
 [urgency_normal]
-    background = "#1e1e2e"
+    background = "#1e1e2eb8"
     foreground = "#cdd6f4"
     frame_color = "#cba6f7"
     timeout = 6
 
 [urgency_critical]
-    background = "#f38ba8"
+    background = "#f38ba8b8"
     foreground = "#1e1e2e"
     frame_color = "#f38ba8"
     timeout = 0

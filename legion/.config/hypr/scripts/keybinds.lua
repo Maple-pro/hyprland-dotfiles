@@ -23,7 +23,6 @@
 
 local HOME = os.getenv("HOME") or ""
 local CONFIG = os.getenv("HYPR_KEYBINDS_CONFIG") or (HOME .. "/.config/hypr/hyprland.lua")
-local DEFAULT_SELF = HOME .. "/.config/hypr/scripts/keybinds.lua"
 
 local US = string.char(31) -- rofi 选项分隔符 \x1f
 local NUL = string.char(0) -- rofi 行内选项前缀 \0
@@ -366,8 +365,8 @@ for _, cat in ipairs(ordered_cats) do
 	groups[#groups + 1] = group
 end
 
-local KEY_COLOR = "#8839ef" -- Catppuccin Latte mauve
-local HEAD_COLOR = "#1e66f5" -- Latte blue
+local KEY_COLOR = "#cba6f7" -- Catppuccin Mocha mauve
+local HEAD_COLOR = "#89b4fa" -- Catppuccin Mocha blue
 
 local out = {}
 for _, group in ipairs(groups) do
@@ -428,17 +427,8 @@ if arg and (arg[1] == "--dump" or arg[1] == "-d") then
 end
 
 if retv == nil then
-	-- 由快捷键/终端直接运行 -> 拉起 rofi 的 keybinds 模式
-	local self = (arg and arg[0]) or DEFAULT_SELF
-	if self:sub(1, 1) ~= "/" then
-		self = DEFAULT_SELF
-	end
-	local cmd = table.concat({
-		"rofi -show keybinds",
-		'-modi "drun,run,window,keybinds:' .. self .. '"',
-		"-theme-str 'window { width: 46%; } listview { lines: 18; }'",
-	}, " ")
-	os.exit(os.execute(cmd) and 0 or 1)
+	-- All entry points use the shared mode list from rofi/config.rasi.
+	os.exit(os.execute("rofi -show keybinds") and 0 or 1)
 end
 
 if retv == "1" then
