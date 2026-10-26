@@ -24,10 +24,14 @@ local function usable(candidate, w)
 end
 
 function M.target(w, hl, windows)
-	for _, candidate in ipairs({ hl.get_active_window(), hl.get_last_window() }) do
-		if usable(candidate, w) then
-			return candidate.workspace
-		end
+	local active = hl.get_active_window()
+	if usable(active, w) then
+		return active.workspace
+	end
+
+	local last = hl.get_last_window()
+	if usable(last, w) then
+		return last.workspace
 	end
 
 	local target = nil

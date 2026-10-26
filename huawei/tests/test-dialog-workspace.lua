@@ -73,6 +73,11 @@ print('PASS scattered candidates without a focus hint are not guessed')
 assert(expect_target(dialog, right, nil, { dialog, left, right }) == right.workspace)
 print('PASS the focused window resolves an ambiguous windows list')
 
+-- With no active window, the last focused window still resolves the target,
+-- even when the remaining candidates are scattered across workspaces.
+assert(expect_target(dialog, nil, parent, { dialog, parent, right }) == parent.workspace)
+print('PASS the last focused window is used when no window is active')
+
 -- Different classes, unmapped windows and windows without a workspace do not
 -- count as candidates.
 local unmapped = win('unmapped', 'pdf', 3, { mapped = false })
@@ -83,11 +88,6 @@ print('PASS unusable candidates are ignored')
 -- A same-class window without a workspace cannot provide a target.
 assert(expect_target(dialog, nil, nil, { dialog, nowhere }) == nil)
 print('PASS a candidate without a workspace is ignored')
-
--- Known implementation gap, deliberately not asserted: when
--- get_active_window() returns nil, ipairs({ nil, last }) stops before the last
--- window, so only the windows fallback applies. Fixing that needs a runtime
--- change; the tests above cover the paths that work today.
 
 -- Workspace selector is unchanged: special, named, numeric and missing names.
 assert(selector({ id = -98, name = 'special:scratchpad' }) == 'special:scratchpad')
