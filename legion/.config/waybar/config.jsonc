@@ -1,12 +1,8 @@
 {
     "layer": "top",
     "position": "top",
-    // "height": 34,
-    "height": 30,
-    "spacing": 4,
-// "margin-top": 8,
-// "margin-left": 8,
-// "margin-right": 8,
+    "height": 38,
+    "spacing": 6,
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": [],
     "modules-right": ["pulseaudio", "custom/mic", "custom/keyboard-state", "backlight", "battery", "memory", "cpu", "tray", "clock"],
@@ -72,7 +68,7 @@
 
     "hyprland/window": {
         "format": "{title}",
-        "max-length": 60,
+        "max-length": 45,
         "separate-outputs": true
     },
 

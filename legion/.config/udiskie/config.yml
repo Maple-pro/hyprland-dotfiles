@@ -1,0 +1,3 @@
+# Explicit light-panel icon: independent of the application's GTK icon lookup.
+icon_names:
+  media: /usr/share/icons/Papirus-Light/22x22/panel/drive-removable-media-usb-panel.svg

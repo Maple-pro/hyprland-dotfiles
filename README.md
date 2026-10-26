@@ -189,6 +189,20 @@ missing Monique preferences without copying active/pinned state. Generated
 timestamps alone do not need syncing. Physical hotplug, actual suspend/resume
 and a fresh login require validation on the machine.
 
+### Legion Waybar compatibility and appearance
+
+The bar uses a 38px full-width glass surface with 6px spacing, switchable
+Latte light and Mocha dark themes,
+rounded workspace/status capsules, readable inactive text and 88% app labels.
+Tooltips use a rounded decoration shadow; the microphone module stays enabled.
+
+Packaged Waybar 0.15.0-3 uses legacy workspace IPC rejected by this Lua session.
+Run `bash legion/update-waybar-git.sh` to download and checksum-verify the pinned
+compatible build under `~/.local/lib/waybar-git`. The user wrapper prefers that
+binary and falls back to `/usr/bin/waybar`. Legion's locked GTK-isolated launcher
+still owns the launch path; no systemd override bypasses it. The system package
+is untouched. Update or remove the local override when reviewing future versions.
+
 ## Huawei projection modes (Super+P)
 
 The Huawei machine has a Windows-style display switcher on **Super+P**, plus a
@@ -312,3 +326,19 @@ Requires the archlinuxcn repository in `/etc/pacman.conf`:
 Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
 ```
 
+
+### Switch Legion Waybar light/dark themes
+
+Edit `~/.config/waybar/style.css` (repository: `legion/.config/waybar/style.css`)
+and select one import: `@import "themes/light.css";` or
+`@import "themes/dark.css";`. Then run
+`~/.config/hypr/scripts/restart-waybar.sh`. No keybinding is added.
+The light theme adapts Huawei Latte with a semi-transparent background,
+blue-to-mauve active workspace and clock, distinct pastel status colors,
+and unified title/workspace/tray capsules. Both themes use local Noto Sans
+text and tooltips with separate workspace/title sizes; Mocha dark stays available. Layout, workspace app labels and
+module commands are shared by both. Light is currently selected for a trial.
+
+The Waybar launcher also reads that selector to choose Papirus-Light or
+Papirus-Dark tray icons through isolated GTK settings. Application-supplied
+tray pixmaps may retain their own colors.

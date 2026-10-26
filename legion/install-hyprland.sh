@@ -188,6 +188,9 @@ ENTRIES=(
 	.config/monique/profiles
 	.config/foot
 	.config/dunst
+    .config/gtk-3.0/settings.ini
+    .config/gtk-4.0/settings.ini
+    .config/udiskie
     .config/xsettingsd
     .config/fcitx5/conf/notifications.conf
     .config/systemd/user/hyprland-session.target
@@ -200,6 +203,7 @@ ENTRIES=(
     .config/systemd/user/moniqued.service.d/hypr56.conf
     .config/systemd/user/hypridle.service.d/hyprland.conf
     .config/systemd/user/hyprpolkitagent.service.d/hyprland.conf
+    .local/bin/waybar
     .local/bin/monique
     .local/bin/moniqued
     .local/share/applications/wps-office-et.desktop
@@ -303,6 +307,8 @@ cat <<EOF
 ${BOLD}Next steps${RESET}
   * Run systemctl --user daemon-reload, then log out and pick Hyprland.
     session-start.sh imports the environment and starts hyprland-session.target.
+
+  * Install the Lua-IPC-compatible build with: bash legion/update-waybar-git.sh
 
   * Waybar is started through hypr/scripts/start-waybar.sh, which points
     XDG_CONFIG_HOME at waybar/gtk-only and uses the keyfile GSettings backend.
