@@ -148,7 +148,7 @@ hl.config({
 
 		gaps_in = 0,
 		gaps_out = { top = 0, right = 0, bottom = 0, left = 0 },
-		border_size = 1,
+		border_size = 0,
 
 		col = {
 			active_border = {
@@ -170,25 +170,11 @@ hl.config({
 	},
 
 	decoration = {
-		-- rounding       = 12,
-		-- active_opacity   = 1.0,
-		-- inactive_opacity = 0.94,
-		--
-		-- shadow = {
-		--     enabled      = true,
-		--     range        = 18,
-		--     render_power = 3,
-		--     color        = 0xaa1a1b26,
-		-- },
-		--
-		-- blur = {
-		--     enabled          = true,
-		--     size             = 5,
-		--     passes           = 2,
-		--     ignore_opacity   = true,
-		--     new_optimizations = true,
-		--     xray             = false,
-		-- },
+		-- 注释掉 = 没有设置 = 用默认值，而 shadow / blur 的默认值都是开。
+		-- 想关必须显式写 false（这就是之前“drop shadow/blur”没生效的原因）。
+		rounding = 0,
+		shadow = { enabled = false },
+		blur = { enabled = false },
 	},
 
 	animations = {
