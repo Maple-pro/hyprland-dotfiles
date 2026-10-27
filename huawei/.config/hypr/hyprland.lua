@@ -151,11 +151,9 @@ hl.config({
 		border_size = 0,
 
 		col = {
-			active_border = {
-				colors = { "rgba(8839efee)", "rgba(ea76cbee)" },
-				-- angle  = 45,
-			},
-			inactive_border = "rgba(acb0becc)",
+			-- 纯色、完全不透明：焦点紫 / 非焦点灰，不做渐变
+			active_border = "rgba(8839efff)",
+			inactive_border = "rgba(acb0beff)",
 		},
 
 		resize_on_border = true,
@@ -368,6 +366,15 @@ hl.window_rule({
 -- 	no_shadow = true,
 -- 	border_size = 0,
 -- })
+
+-- foot 没有标题栏，和旁边的终端平铺在一起时（gaps/border 都是 0）会糊成一片。
+-- 只给 foot 补 1px 纯色边框，其它窗口继续保持 flat：
+-- 焦点 = 不透明紫色，非焦点 = 不透明灰色，不做渐变。
+hl.window_rule({
+	name = "foot-border",
+	match = { class = "^foot$" },
+	border_size = 1,
+})
 
 hl.window_rule({
 	name = "suppress-maximize-events",
