@@ -37,6 +37,7 @@ legion/.config/rofi/                 Rofi launcher, keybind cheatsheet and proje
 legion/.config/monique/profiles/     Legion projection profiles
 legion/.config/foot/                 Foot terminal
 legion/.config/dunst/                Dunst notifications
+legion/.config/chrome-flags.conf      Chrome flags: software compositing for correct fullscreen
 huawei/install-hyprland.sh           Huawei package + configuration installer
 huawei/update-waybar-git.sh          Optional Lua-IPC-compatible Waybar build (workspace clicks)
 huawei/setup-mx150.sh                GeForce MX150 (580xx legacy) driver setup
@@ -174,6 +175,15 @@ The input-method settings remain user-session declarations, including
 Wayland diagnostic notifications are hidden. Newly started applications inherit
 the new environment. WPS Spreadsheet's user desktop entry invokes the local XCB
 wrapper with RandR disabled and Legion's 1.25 scale.
+
+Chromium composites on the GPU here, and on this Intel/i915 session those
+frames reached the compositor blank: **Super+F** blackened the panel while the
+compositor kept rendering correctly (screencaptures were unaffected, and
+XWayland apps plus Firefox were fine). `~/.config/chrome-flags.conf` therefore
+keeps `--disable-gpu-compositing` — GPU rasterisation and decode stay, only the
+final composition moves to the CPU. VRR, direct scanout, damage tracking, the
+monitor rules, and Chromium's profile, scale flag and ANGLE backend were all
+ruled out; re-test the flag after a Chromium or Mesa upgrade before widening it.
 
 Idle locking is **10 minutes**. Before suspend, hypridle requests the session
 lock and waits for the Wayland lock notification; wake-up turns displays on.

@@ -183,6 +183,7 @@ UNAVAILABLE=(
 # -----------------------------------------------------------------------------
 ENTRIES=(
 	.config/hypr
+	.config/chrome-flags.conf
 	.config/waybar
 	.config/rofi
 	.config/monique/profiles
