@@ -83,7 +83,15 @@
             "class<kfontview>": "fontview",
             "class<pinentry-qt>": "pinentry",
             "class<system-config-printer>": "printer",
-            "class<rofi>": "rofi"
+            "class<rofi>": "rofi",
+
+            // 兜底：未单独配置缩写的窗口，取 class 的最后一个词
+            // （如 com.tencent.wechatappex → wechatappex）；
+            // 只有一个词的 class（如 foot）保持原样。
+            // 键故意写成 [c]lass 而不是 class：waybar 依据规则文本中是否含
+            // "class"/"title" 计算优先级，这样本规则优先级最低、最后匹配，
+            // 不会覆盖上面手写的缩写；值 $1 引用正则的第一个捕获组。
+            "^[c]lass<(?:.*[._ /-])?([^._ />-]+)[ ]*>[ ]*$": "$1"
         }
     },
 
