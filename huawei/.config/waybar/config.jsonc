@@ -5,6 +5,9 @@
     "spacing": 6,
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": [],
+    // 居中区域为空；不用 center widget，避免 GTK 把左右各限一半宽度，
+    // 这样 window title 能用到右侧模块前的全部空间，放不下时才出现省略号。
+    "no-center": true,
     "modules-right": ["pulseaudio", "custom/keyboard-state", "backlight", "battery", "memory", "cpu", "tray", "clock"],
 
     // workspace number + dimmed short app tags of the windows it holds
@@ -95,9 +98,9 @@
         }
     },
 
+    // 不设 max-length：标题按可用宽度显示，整条栏放不下时由 GTK 自动省略
     "hyprland/window": {
         "format": "{title}",
-        "max-length": 60,
         "separate-outputs": true
     },
 
