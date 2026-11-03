@@ -463,6 +463,60 @@ hl.bind(mainMod .. " + BRACKETLEFT", hl.dsp.focus({ workspace = "m-1" }))
 hl.bind(mainMod .. " + BRACKETRIGHT", hl.dsp.focus({ workspace = "m+1" }))
 hl.bind(mainMod .. " + BACKSPACE", hl.dsp.focus({ workspace = "previous" }))
 
+-- 把工作区搬到别的显示器（整块搬，里面的窗口跟着走）
+-- Hyprland 0.57 的 Lua 里对应的 dispatcher 只有一个 hl.dsp.workspace.move：
+--   { monitor = "HDMI-A-1" }                 当前工作区 → 指定屏，视图跟过去
+--   { monitor = "right" }                    当前工作区 → 右边那块屏
+--   { monitor = "left" } / "up" / "down" / "+1" / "-1" / "current" 都是合法选择器
+--   { workspace = 3, monitor = "HDMI-A-1" }  指定工作区 → 指定屏（当前视图不跟过去）
+-- 光靠 "left"/"right" 在多屏边缘会报 Monitor not found，所以下面用 Lua 函数算目标屏：
+-- 有几块屏就去"下一块 / 上一块"，只有一块屏时什么都不做。
+local function moveWorkspaceToMonitor(step)
+	return function()
+		local monitors = hl.get_monitors() or {}
+		if #monitors < 2 then
+			return
+		end
+		local active = hl.get_active_monitor()
+		local from = 1
+		for i, m in ipairs(monitors) do
+			if m.name == (active and active.name) then
+				from = i
+				break
+			end
+		end
+		local target = monitors[((from - 1 + step) % #monitors) + 1]
+		hl.dispatch(hl.dsp.workspace.move({ monitor = target.name }))
+	end
+end
+
+hl.bind(
+	mainMod .. " + SHIFT + COMMA",
+	moveWorkspaceToMonitor(-1),
+	{ description = "Move workspace to previous monitor", category = "Workspace" }
+)
+hl.bind(
+	mainMod .. " + SHIFT + PERIOD",
+	moveWorkspaceToMonitor(1),
+	{ description = "Move workspace to next monitor", category = "Workspace" }
+)
+
+-- 两台显示器的工作区对调（各自留在原地，内容互换）
+hl.bind(mainMod .. " + SHIFT + S", function()
+	local monitors = hl.get_monitors() or {}
+	local active = hl.get_active_monitor()
+	local other
+	for _, m in ipairs(monitors) do
+		if m.name ~= (active and active.name) then
+			other = m
+			break
+		end
+	end
+	if other then
+		hl.dispatch(hl.dsp.workspace.swap_monitors({ monitor1 = active.name, monitor2 = other.name }))
+	end
+end, { description = "Swap workspaces between monitors", category = "Workspace" })
+
 -- Scratchpad
 hl.bind(mainMod .. " + GRAVE", hl.dsp.workspace.toggle_special("scratchpad"))
 hl.bind(mainMod .. " + SHIFT + GRAVE", hl.dsp.window.move({ workspace = "special:scratchpad" }))
