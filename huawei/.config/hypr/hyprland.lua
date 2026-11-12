@@ -304,13 +304,8 @@ hl.window_rule({
 	center = true,
 })
 
-hl.window_rule({
-	name = "float-file-manager",
-	match = { class = "^(doublecmd|doublecmd-qt6|doublecmd-qt|Double Commander)$" },
-	float = true,
-	size = { "(monitor_w*0.75)", "(monitor_h*0.75)" },
-	center = true,
-})
+-- Double Commander 按普通平铺窗口打开（默认工作区见上面的 fixedWorkspaceApps），
+-- 不再加 float 规则；需要浮动时用 Super+V 手动切换。
 
 hl.window_rule({
 	name = "float-pavucontrol",
