@@ -158,7 +158,7 @@ end
 local CMD_RULES = {
 	{ "powermenu.sh", "Power menu (lock / suspend / logout / reboot / shutdown)", "System" },
 	{ "cliphist", "Clipboard history", "System" },
-	{ 'grim -g "$(slurp)"', "Screenshot region → clipboard", "System" },
+	{ 'grim -g "$(slurp', "Screenshot region → clipboard", "System" },
 	{ "grim - |", "Screenshot full screen → clipboard", "System" },
 	{ "hyprpicker", "Pick color (HEX to clipboard)", "System" },
 	{ "hyprlock", "Lock screen", "System" },

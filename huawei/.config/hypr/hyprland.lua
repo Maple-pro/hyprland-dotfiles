@@ -412,7 +412,10 @@ hl.bind(
 )
 
 -- Utilities
-hl.bind(mainMod .. " + S", hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy'))
+-- slurp 的边框以选区边界为中心描边（默认 -w 2），内侧那 1px 会被 grim -g 原样
+-- 截进图片最外圈，看起来像黑边。保留默认边框（选区轮廓更清楚），截完用
+-- magick -shave 1x1 把这一圈裁掉；png32 输出强制 8bit RGBA，避免 IM 自行量化成调色板。
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd('grim -g "$(slurp)" - | magick png:- -shave 1x1 png32:- | wl-copy'))
 hl.bind("PRINT", hl.dsp.exec_cmd("grim - | wl-copy"))
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("hyprpicker -a"))
 hl.bind(
