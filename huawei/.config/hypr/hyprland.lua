@@ -417,6 +417,28 @@ hl.bind(
 -- magick -shave 1x1 把这一圈裁掉；png32 输出强制 8bit RGBA，避免 IM 自行量化成调色板。
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd('grim -g "$(slurp)" - | magick png:- -shave 1x1 png32:- | wl-copy'))
 hl.bind("PRINT", hl.dsp.exec_cmd("grim - | wl-copy"))
+
+-- 贴图（flameshot 的 pin 等价物）：截完立刻钉在屏幕上，一圈蓝紫渐变外框区分
+-- 于普通窗口；左键拖动 / 左键双击关闭 / 滚轮缩放 / 中键复制 / 右键关闭。
+-- 走 layer-shell overlay，所以不抢焦点、不参与平铺。
+-- 实现见 scripts/pin-shot.sh（抓图）+ scripts/pin-image.py（贴图窗口）。
+local pinShot = "/home/yangfeng/.config/hypr/scripts/pin-shot.sh"
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd(pinShot), { description = "Screenshot region → pin on screen" })
+hl.bind(
+	"SHIFT + PRINT",
+	hl.dsp.exec_cmd(pinShot .. " --full"),
+	{ description = "Screenshot full screen → pin on screen" }
+)
+hl.bind(
+	mainMod .. " + ALT + V",
+	hl.dsp.exec_cmd(pinShot .. " --clip"),
+	{ description = "Pin clipboard image on screen" }
+)
+hl.bind(
+	mainMod .. " + ALT + X",
+	hl.dsp.exec_cmd("pkill -f '[s]cripts/pin-image.py'"),
+	{ description = "Close all pinned screenshots" }
+)
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("hyprpicker -a"))
 hl.bind(
 	mainMod .. " + SHIFT + V",
