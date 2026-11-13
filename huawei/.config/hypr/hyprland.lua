@@ -453,7 +453,6 @@ hl.bind(
 	{ description = "Show keybind cheatsheet" }
 )
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("systemctl --user kill --kill-whom=main --signal=SIGUSR1 waybar.service"))
-hl.bind(mainMod .. " + ESCAPE", hl.dsp.exit())
 
 -- Focus
 hl.bind(mainMod .. " + left", hl.dsp.focus({ direction = "left" }))
