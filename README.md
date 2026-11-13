@@ -39,7 +39,6 @@ legion/.config/foot/                 Foot terminal
 legion/.config/dunst/                Dunst notifications
 legion/.config/chrome-flags.conf      Chrome flags: software compositing for correct fullscreen
 huawei/install-hyprland.sh           Huawei package + configuration installer
-huawei/update-waybar-git.sh          Optional Lua-IPC-compatible Waybar build (workspace clicks)
 huawei/setup-mx150.sh                GeForce MX150 (580xx legacy) driver setup
 legion/install-hyprland.sh           Legion package + configuration installer
 Hyprland_Guide.md                    Basic usage guide
@@ -70,18 +69,6 @@ first, and pacman runs with `--needed`, so re-running is safe. Packages that are
 not in the official repositories are printed at the end rather than installed,
 so no AUR helper is required. Running the script as your normal user is
 preferred: it escalates with `sudo` only for pacman.
-
-On Huawei, workspace clicks in Waybar need a Lua-IPC-compatible build (the
-packaged 0.15.0 still sends the legacy Hyprland dispatch syntax). After the
-installer, run:
-
-```bash
-bash huawei/update-waybar-git.sh
-```
-
-The profile ships a wrapper and a systemd drop-in that fall back to
-`/usr/bin/waybar` until then: the bar still works, clicks stay broken. See
-[Huawei deployment](huawei/README.md).
 
 After copying or editing the Hyprland config, reload it with:
 
