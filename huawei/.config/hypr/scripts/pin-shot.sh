@@ -53,7 +53,7 @@ case "${1:-}" in
 		launch "$img" "$mon_x" "$mon_y"
 	fi
 	img=$(newimg)
-	grim - - | magick png:- png32:"$img" || exit 1
+	grim - | magick png:- png32:"$img" || exit 1
 	prune
 	launch "$img"
 	;;
