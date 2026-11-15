@@ -100,8 +100,8 @@ PACKAGES=(
 	dunst
 
 	# screenshots and clipboard history.
-	# legion pipes grim into xclip (huawei uses wl-copy instead), and the
-	# clipboard menu script reads cliphist.
+	# Buffer region captures and trim the selection border before copying.
+	imagemagick
 	grim
 	slurp
 	xclip

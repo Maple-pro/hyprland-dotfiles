@@ -13,6 +13,7 @@ local fileSearch = "fsearch"
 local keybindsHelp = "/home/yangfeng/.config/hypr/scripts/keybinds.lua"
 local projectMode = "/home/yangfeng/.config/hypr/scripts/project-mode.lua"
 local waybarRestart = "/home/yangfeng/.config/hypr/scripts/restart-waybar.sh"
+local copySelection = "/home/yangfeng/.config/hypr/scripts/copy-selection.sh"
 local mainMod = "SUPER"
 
 -- 切换圆角 / margin：true = 圆角 + 外边距，false = 0 圆角 + 0 外边距
@@ -410,12 +411,14 @@ hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("rofi -show project"), { description 
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
 
 -- Utilities
--- WeChat runs through XWayland; copy screenshots directly to the X11 clipboard.
--- Hyprland 0.56 currently does not bridge wl-copy image selections to XWayland.
-hl.bind(mainMod .. " + S", hl.dsp.exec_cmd('grim -g "$(slurp)" - | xclip -selection clipboard -t image/png -i'))
-hl.bind("PRINT", hl.dsp.exec_cmd("grim - | xclip -selection clipboard -t image/png -i"))
+-- slurp 的边框以选区边界为中心描边（默认 -w 2），内侧那 1px 会被 grim -g 原样
+-- 截进图片最外圈，看起来像黑边。保留默认边框（选区轮廓更清楚），截完用
+-- magick -shave 1x1 把这一圈裁掉；png32 输出强制 8bit RGBA，避免 IM 自行量化成调色板。
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd(copySelection .. " region"))
+hl.bind("PRINT", hl.dsp.exec_cmd("grim - | wl-copy"))
+
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("hyprpicker -a"))
-hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("/home/yangfeng/.config/hypr/scripts/clipboard-menu.sh"))
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(copySelection .. " history"))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd(powerMenu))
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("pkill -SIGUSR1 waybar"))

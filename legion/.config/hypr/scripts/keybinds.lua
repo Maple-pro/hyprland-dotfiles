@@ -156,8 +156,8 @@ end
 -- exec 命令的说明规则：从上到下匹配，先具体后通用
 local CMD_RULES = {
 	{ "powermenu.sh", "Power menu (lock / suspend / logout / reboot / shutdown)", "System" },
-	{ "cliphist", "Clipboard history", "System" },
-	{ 'grim -g "$(slurp)"', "Screenshot region → clipboard", "System" },
+	{ "copy-selection.sh history", "Clipboard history", "System" },
+	{ "copy-selection.sh region", "Screenshot region → clipboard", "System" },
 	{ "grim - |", "Screenshot full screen → clipboard", "System" },
 	{ "hyprpicker", "Pick color (HEX to clipboard)", "System" },
 	{ "hyprlock", "Lock screen", "System" },
