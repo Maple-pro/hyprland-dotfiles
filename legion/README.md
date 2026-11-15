@@ -22,3 +22,7 @@ Super+Shift+S 区域贴图；Shift+Print 当前屏幕贴图；Super+Alt+V 剪贴
 ## tile file managers by default
 
 Krusader 与 Dolphin 默认平铺；Super+V 仍可手动切换浮动。
+
+## toggle mute only once per key press
+
+扬声器与麦克风静音键不再长按重复切换；音量调节仍支持重复。

@@ -496,12 +496,12 @@ hl.bind(
 hl.bind(
 	"XF86AudioMute",
 	hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ toggle"),
-	{ locked = true, repeating = true }
+	{ locked = true }
 )
 hl.bind(
 	"XF86AudioMicMute",
 	hl.dsp.exec_cmd("pactl set-source-mute @DEFAULT_SOURCE@ toggle"),
-	{ locked = true, repeating = true }
+	{ locked = true }
 )
 hl.bind("F4", hl.dsp.exec_cmd("pactl set-source-mute @DEFAULT_SOURCE@ toggle"))
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
