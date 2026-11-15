@@ -14,3 +14,7 @@ Super+Shift+S 区域贴图；Shift+Print 当前屏幕贴图；Super+Alt+V 剪贴
 ## reconcile monitor layouts without compositor Lua timers
 
 显示事件通过外部 debounce 脚本等待布局稳定；不再注册合成器 Lua timer。保留工作区手动迁移，FALLBACK 恢复有次数上限，内屏恢复仍使用 2560×1600@60、1.25 倍缩放。
+
+## guard session lifetime through the compositor socket
+
+会话监视器检查合成器 socket，并给启动过程留出宽限时间；合成器退出后清理会话服务。
