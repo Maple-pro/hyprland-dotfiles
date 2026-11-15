@@ -62,3 +62,7 @@ Waybar 使用 /usr/bin/waybar；保留启动锁与 GTK 隔离，旧本地构建�
 ## restore the built-in workspace click handler
 
 移除被当作 shell 命令执行的 on-click=activate，恢复模块内置工作区点击处理。
+
+## strengthen tray popup labels and symbolic icons
+
+托盘展开菜单文字为 14px、600 字重，符号图标随文字着色。

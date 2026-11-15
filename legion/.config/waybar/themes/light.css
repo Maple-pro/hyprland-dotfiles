@@ -498,3 +498,7 @@ tooltip label, tooltip calendar {
     font-weight: 600;
 }
 #window.empty { background-color: transparent; box-shadow: none; }
+
+/* Tray popup text follows the bar weight; symbolic menu icons follow text color. */
+menu menuitem label { font-family: "Noto Sans", "Noto Sans CJK SC", sans-serif; font-size: 14px; font-weight: 600; }
+menu menuitem image { -gtk-icon-style: symbolic; color: @text; }
