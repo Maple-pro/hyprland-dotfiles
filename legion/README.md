@@ -46,3 +46,7 @@ Super+Ctrl+S 对调两块显示器上的工作区，不占用区域贴图快捷�
 ## use the distribution Waybar binary
 
 Waybar 使用 /usr/bin/waybar；保留启动锁与 GTK 隔离，旧本地构建不再被选择，旧下载脚本已移除。
+
+## let window titles use the available Waybar width
+
+窗口标题使用状态模块前的可用宽度，不再固定截断到 45 个字符。

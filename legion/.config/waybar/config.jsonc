@@ -5,6 +5,7 @@
     "spacing": 6,
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": [],
+    "no-center": true,
     "modules-right": ["pulseaudio", "custom/mic", "custom/keyboard-state", "backlight", "battery", "memory", "cpu", "tray", "clock"],
 
     "hyprland/workspaces": {
@@ -68,7 +69,6 @@
 
     "hyprland/window": {
         "format": "{title}",
-        "max-length": 45,
         "separate-outputs": true
     },
 
