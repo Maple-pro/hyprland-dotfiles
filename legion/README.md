@@ -18,3 +18,7 @@ Super+Shift+S 区域贴图；Shift+Print 当前屏幕贴图；Super+Alt+V 剪贴
 ## guard session lifetime through the compositor socket
 
 会话监视器检查合成器 socket，并给启动过程留出宽限时间；合成器退出后清理会话服务。
+
+## tile file managers by default
+
+Krusader 与 Dolphin 默认平铺；Super+V 仍可手动切换浮动。

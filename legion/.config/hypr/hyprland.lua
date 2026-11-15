@@ -319,13 +319,8 @@ hl.window_rule({
 })
 
 
-hl.window_rule({
-	name = "float-file-manager",
-	match = { class = "^(org.kde.dolphin|org.kde.krusader|krusader)$" },
-	float = true,
-	size = { "(monitor_w*0.75)", "(monitor_h*0.75)" },
-	center = true,
-})
+-- File managers use normal tiling; Super+V toggles floating when needed.
+
 
 hl.window_rule({
 	name = "float-pavucontrol",
