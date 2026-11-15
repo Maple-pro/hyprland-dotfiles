@@ -60,7 +60,8 @@
             "class<pinentry-qt>": "pinentry",
             "class<system-config-printer>": "printer",
             "class<rofi>": "rofi",
-            "class<mihomo-party>": "clash"
+            "class<mihomo-party>": "clash",
+            "^[c]lass<(?:.*[._ /-])?([^._ />-]+)[ ]*>[ ]*$": "$1"
         },
         "on-click": "activate",
         "on-scroll-up": "hyprctl dispatch workspace m-1",

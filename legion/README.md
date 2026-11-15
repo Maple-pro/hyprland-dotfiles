@@ -50,3 +50,7 @@ Waybar 使用 /usr/bin/waybar；保留启动锁与 GTK 隔离，旧本地构建�
 ## let window titles use the available Waybar width
 
 窗口标题使用状态模块前的可用宽度，不再固定截断到 45 个字符。
+
+## shorten unknown workspace application labels
+
+未知应用的工作区标签取窗口 class 最后一段，现有手写缩写优先。
