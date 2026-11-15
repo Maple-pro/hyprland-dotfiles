@@ -66,3 +66,7 @@ Waybar 使用 /usr/bin/waybar；保留启动锁与 GTK 隔离，旧本地构建�
 ## strengthen tray popup labels and symbolic icons
 
 托盘展开菜单文字为 14px、600 字重，符号图标随文字着色。
+
+## render NetworkManager menu icons with the bar palette
+
+Wi-Fi 左键菜单图标由 nm-applet 生成内嵌 PNG，因此生产端也使用与 Waybar 一致的 GTK 配色。托盘本体仍随网络状态与信号强度变化，不使用固定图标。切换主题后重新启动 nm-applet 与 Waybar。

@@ -12,6 +12,12 @@ if grep -Eq '^[[:space:]]*@import[[:space:]]+"themes/light[.]css"' "$HOME/.confi
 fi
 export XDG_CONFIG_HOME="${HOME}/.config/waybar/gtk-only/${theme}"
 export XDG_DATA_DIRS="${HOME}/.config/waybar/gtk-only/${theme}/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+# The desktop portal can override settings.ini; explicitly select the popup theme.
+if [[ $theme == dark ]]; then
+    export GTK_THEME=Breeze:dark
+else
+    export GTK_THEME=Breeze
+fi
 export GSETTINGS_BACKEND=keyfile
 export GDK_BACKEND=wayland
 exec /usr/bin/waybar -c "${HOME}/.config/waybar/config.jsonc" -s "${HOME}/.config/waybar/style.css"
