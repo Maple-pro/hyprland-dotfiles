@@ -34,3 +34,7 @@ Krusader 与 Dolphin 默认平铺；Super+V 仍可手动切换浮动。
 ## disable idle auto-lock while retaining explicit locks
 
 关闭空闲自动锁屏；Super+L 手动锁屏与休眠前锁屏继续生效。
+
+## move the active workspace between monitors
+
+Super+Shift+,/. 将整个当前工作区移到上一块或下一块显示器；单屏不操作。
