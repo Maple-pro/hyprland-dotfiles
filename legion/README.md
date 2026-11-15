@@ -10,3 +10,7 @@ Super+S 截取区域并裁掉选区内侧 1px 边框，生产步骤全部成功�
 ## add HiDPI screenshot pins and discoverable shortcuts
 
 Super+Shift+S 区域贴图；Shift+Print 当前屏幕贴图；Super+Alt+V 剪贴板图片贴图；Super+Alt+X 关闭全部贴图。左键拖动、滚轮缩放、中键复制、双击或右键关闭。按实际分数缩放从原图绘制；GTK3 分数缩放仍可能产生少量插值。Super+/ 的 cheatsheet 包含这些条目。
+
+## reconcile monitor layouts without compositor Lua timers
+
+显示事件通过外部 debounce 脚本等待布局稳定；不再注册合成器 Lua timer。保留工作区手动迁移，FALLBACK 恢复有次数上限，内屏恢复仍使用 2560×1600@60、1.25 倍缩放。
