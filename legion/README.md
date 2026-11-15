@@ -38,3 +38,7 @@ Krusader 与 Dolphin 默认平铺；Super+V 仍可手动切换浮动。
 ## move the active workspace between monitors
 
 Super+Shift+,/. 将整个当前工作区移到上一块或下一块显示器；单屏不操作。
+
+## swap monitor workspaces with Super+Ctrl+S
+
+Super+Ctrl+S 对调两块显示器上的工作区，不占用区域贴图快捷键。

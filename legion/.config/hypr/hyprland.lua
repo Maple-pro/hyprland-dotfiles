@@ -511,6 +511,23 @@ hl.bind(
 	{ description = "Move workspace to next monitor", category = "Workspace" }
 )
 
+-- 两台显示器的工作区对调（各自留在原地，内容互换）
+-- 注意：原来是 SUPER+SHIFT+S，那个键位已经让给"区域截图贴屏"，这里改用 SUPER+CTRL+S
+hl.bind(mainMod .. " + CTRL + S", function()
+	local monitors = hl.get_monitors() or {}
+	local active = hl.get_active_monitor()
+	local other
+	for _, m in ipairs(monitors) do
+		if m.name ~= (active and active.name) then
+			other = m
+			break
+		end
+	end
+	if other then
+		hl.dispatch(hl.dsp.workspace.swap_monitors({ monitor1 = active.name, monitor2 = other.name }))
+	end
+end, { description = "Swap workspaces between monitors", category = "Workspace" })
+
 -- Scratchpad
 hl.bind(mainMod .. " + GRAVE", hl.dsp.workspace.toggle_special("scratchpad"))
 hl.bind(mainMod .. " + SHIFT + GRAVE", hl.dsp.window.move({ workspace = "special:scratchpad" }))
