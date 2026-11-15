@@ -30,3 +30,7 @@ Krusader 与 Dolphin 默认平铺；Super+V 仍可手动切换浮动。
 ## remove the immediate Super+Escape logout shortcut
 
 移除 Super+Esc 直接退出会话；使用 Super+X 电源菜单退出。
+
+## disable idle auto-lock while retaining explicit locks
+
+关闭空闲自动锁屏；Super+L 手动锁屏与休眠前锁屏继续生效。
