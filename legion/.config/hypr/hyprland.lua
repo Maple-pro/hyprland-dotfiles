@@ -443,7 +443,6 @@ hl.bind(
 	hl.dsp.exec_cmd("/home/yangfeng/.config/hypr/scripts/apply-rounding.sh toggle"),
 	{ description = "Toggle rounded corners and margins" }
 )
-hl.bind(mainMod .. " + ESCAPE", hl.dsp.exit())
 
 -- Focus
 hl.bind(mainMod .. " + left", hl.dsp.focus({ direction = "left" }))

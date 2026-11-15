@@ -26,3 +26,7 @@ Krusader 与 Dolphin 默认平铺；Super+V 仍可手动切换浮动。
 ## toggle mute only once per key press
 
 扬声器与麦克风静音键不再长按重复切换；音量调节仍支持重复。
+
+## remove the immediate Super+Escape logout shortcut
+
+移除 Super+Esc 直接退出会话；使用 Super+X 电源菜单退出。
