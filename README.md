@@ -172,7 +172,7 @@ final composition moves to the CPU. VRR, direct scanout, damage tracking, the
 monitor rules, and Chromium's profile, scale flag and ANGLE backend were all
 ruled out; re-test the flag after a Chromium or Mesa upgrade before widening it.
 
-Idle locking is **10 minutes**. Before suspend, hypridle requests the session
+Idle auto-lock is disabled; manual and suspend locking remain enabled. Before suspend, hypridle requests the session
 lock and waits for the Wayland lock notification; wake-up turns displays on.
 Battery alerts trigger once per discharge level at **20/10/5 percent**. Caps Lock
 reads sysfs LEDs, the calendar's right click uses the supported action mapping,
@@ -193,12 +193,9 @@ Latte light and Mocha dark themes,
 rounded workspace/status capsules, readable inactive text and 88% app labels.
 Tooltips use a rounded decoration shadow; the microphone module stays enabled.
 
-Packaged Waybar 0.15.0-3 uses legacy workspace IPC rejected by this Lua session.
-Run `bash legion/update-waybar-git.sh` to download and checksum-verify the pinned
-compatible build under `~/.local/lib/waybar-git`. The user wrapper prefers that
-binary and falls back to `/usr/bin/waybar`. Legion's locked GTK-isolated launcher
-still owns the launch path; no systemd override bypasses it. The system package
-is untouched. Update or remove the local override when reviewing future versions.
+Legion now uses the distribution Waybar through its GTK-isolated launcher.
+See [Legion configuration notes](legion/README.md) for screenshot pins, monitor
+shortcuts, locking preferences and tray menu theming.
 
 ## Huawei projection modes (Super+P)
 
