@@ -9,7 +9,7 @@
     "modules-right": ["pulseaudio", "custom/mic", "custom/keyboard-state", "backlight", "battery", "memory", "cpu", "tray", "clock"],
 
     "hyprland/workspaces": {
-        "format": "{name} <span alpha='88%'>{windows}</span>",
+        "format": "{name}  <span alpha='88%'>{windows}</span>",
         "format-window-separator": " ",
         "window-rewrite-default": "{class}",
         "window-rewrite": {

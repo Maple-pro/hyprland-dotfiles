@@ -54,3 +54,7 @@ Waybar 使用 /usr/bin/waybar；保留启动锁与 GTK 隔离，旧本地构建�
 ## shorten unknown workspace application labels
 
 未知应用的工作区标签取窗口 class 最后一段，现有手写缩写优先。
+
+## separate workspace numbers from application labels
+
+工作区序号与应用标签之间保留两个空格，便于辨认。
