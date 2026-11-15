@@ -313,8 +313,6 @@ ${BOLD}Next steps${RESET}
   * Run systemctl --user daemon-reload, then log out and pick Hyprland.
     session-start.sh imports the environment and starts hyprland-session.target.
 
-  * Install the Lua-IPC-compatible build with: bash legion/update-waybar-git.sh
-
   * Waybar is started through hypr/scripts/start-waybar.sh, which points
     XDG_CONFIG_HOME at waybar/gtk-only and uses the keyfile GSettings backend.
 

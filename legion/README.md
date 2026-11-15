@@ -42,3 +42,7 @@ Super+Shift+,/. 将整个当前工作区移到上一块或下一块显示器；�
 ## swap monitor workspaces with Super+Ctrl+S
 
 Super+Ctrl+S 对调两块显示器上的工作区，不占用区域贴图快捷键。
+
+## use the distribution Waybar binary
+
+Waybar 使用 /usr/bin/waybar；保留启动锁与 GTK 隔离，旧本地构建不再被选择，旧下载脚本已移除。
