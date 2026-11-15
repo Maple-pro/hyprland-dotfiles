@@ -100,8 +100,12 @@ PACKAGES=(
 	dunst
 
 	# screenshots and clipboard history.
-	# Buffer region captures and trim the selection border before copying.
+	# Buffered region capture, XWayland clipboard and layer-shell pinned images.
 	imagemagick
+	python-gobject
+	python-cairo
+	gtk3
+	gtk-layer-shell
 	grim
 	slurp
 	xclip

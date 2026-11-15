@@ -159,6 +159,10 @@ local CMD_RULES = {
 	{ "copy-selection.sh history", "Clipboard history", "System" },
 	{ "copy-selection.sh region", "Screenshot region → clipboard", "System" },
 	{ "grim - |", "Screenshot full screen → clipboard", "System" },
+	{ "pin-shot.sh --full", "Screenshot full screen → pin on screen", "System" },
+	{ "pin-shot.sh --clip", "Pin clipboard image on screen", "System" },
+	{ "pin-shot.sh", "Screenshot region → pin on screen", "System" },
+	{ "[s]cripts/pin-image.py", "Close all pinned screenshots", "System" },
 	{ "hyprpicker", "Pick color (HEX to clipboard)", "System" },
 	{ "hyprlock", "Lock screen", "System" },
 	{ "loginctl lock-session", "Lock screen", "System" },
@@ -212,6 +216,14 @@ end
 local function describe(bind)
 	local d = bind.dispatcher
 	local FALLBACK_CAT = "Other"
+
+	-- 绑定的 options 里写了 description（可再加 category）就直接用，
+	-- 对 hl.bind(键, 函数, {...}) 这种自定义 Lua 动作尤其有用。
+	local opts = bind.opts or {}
+	if type(opts.description) == "string" and opts.description ~= "" then
+		local cat = type(opts.category) == "string" and opts.category or FALLBACK_CAT
+		return opts.description, cat
+	end
 
 	if not d then
 		-- dispatcher 传的是 Lua 函数而不是 hl.dsp.*（本配置没有，但别炸）

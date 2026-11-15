@@ -6,3 +6,7 @@
 ## buffer region screenshots before replacing the clipboard
 
 Super+S 截取区域并裁掉选区内侧 1px 边框，生产步骤全部成功后才替换剪贴板。保留 XWayland 的 xclip 和共享 Rofi 历史模式；Print 将整屏复制到 Wayland 剪贴板。
+
+## add HiDPI screenshot pins and discoverable shortcuts
+
+Super+Shift+S 区域贴图；Shift+Print 当前屏幕贴图；Super+Alt+V 剪贴板图片贴图；Super+Alt+X 关闭全部贴图。左键拖动、滚轮缩放、中键复制、双击或右键关闭。按实际分数缩放从原图绘制；GTK3 分数缩放仍可能产生少量插值。Super+/ 的 cheatsheet 包含这些条目。
